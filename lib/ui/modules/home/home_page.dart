@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
+import 'package:focus_app/ui/modules/home/widgets/chats/chat_id.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -37,8 +39,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                 children: [
                   Container(
                     color: Colors.black38,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Row(
                       children: [
                         Container(
@@ -68,10 +69,10 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                   Expanded(
                     child: ListView(
                       children: [
-                        Chat(),
-                        Chat(),
-                        Chat(),
-                        Chat(),
+                        ChatID(),
+                        ChatID(),
+                        ChatID(),
+                        ChatID(),
                       ],
                     ),
                   ),
@@ -80,7 +81,8 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.yellow,
+              color: AppColor.background,
+              child: ChatFlow(),
             ),
           ),
           Expanded(

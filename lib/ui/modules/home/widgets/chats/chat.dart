@@ -1,50 +1,204 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:focus_app/core/models/message.dart';
+import 'package:focus_app/ui/base/app_color.dart';
+import 'package:focus_app/ui/base/common.dart';
+import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
 
+enum ChatAction { location, voice, picture, attach, text, send }
+List<ChatAction> chatActions = [
+  ChatAction.location,
+  ChatAction.voice,
+  ChatAction.picture,
+  ChatAction.attach,
+  ChatAction.text,
+  ChatAction.send
+];
 
-
-class Chat extends StatefulWidget {
+class ChatFlow extends StatefulWidget {
   @override
-  _ChatState createState() => _ChatState();
+  _ChatFlowState createState() => _ChatFlowState();
 }
 
-class _ChatState extends State<Chat> {
+class _ChatFlowState extends State<ChatFlow> {
+
+
+  List<MessageModel> messages = [
+    MessageModel(
+      type: MessageType.text,
+      content: textTest1,
+      messageForm: MessageForm.homie
+    ),
+    MessageModel(
+      type: MessageType.text,
+      content: textTest1,
+      messageForm: MessageForm.owner
+    ),
+    MessageModel(
+      type: MessageType.text,
+      content: textTest1,
+      messageForm: MessageForm.owner
+    ),
+    MessageModel(
+      type: MessageType.text,
+      content: textTest1,
+      messageForm: MessageForm.homie
+    ),
+  ];
+  FocusNode textNode;
+
+  TextEditingController textController = TextEditingController();
+  ScrollController chatController = ScrollController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    textNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    textNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    textNode.requestFocus();
     return Container(
-      color: Color(0xff485565),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: EdgeInsets.symmetric(horizontal: 8,vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+      child: Column(
         children: [
           Container(
-            alignment: Alignment.center,
-            padding: EdgeInsets.all(12),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle
+                color: Colors.black38),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.actionColor,
+                  ),
+                  child: Icon(Icons.people),
+                ),
+                Text("NO 1",
+                style: TextStyle(
+                  color: Colors.white
+                ),)
+              ],
             ),
-            child: Icon(Icons.people),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              "mac mi",
-              style: TextStyle(
-                color: Colors.white,
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              reverse: false,
+              controller: chatController,
+              itemCount: messages.length,
+              itemBuilder: (context, index){
+                return Message(messages[index]);
+              },
+            ),
+          ),
+          Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.black38,
+              ),
+              child: Row(
+                children: chatActions
+                    .asMap()
+                    .map((key, action) => MapEntry(action, actionItem(action)))
+                    .values
+                    .toList(),
+              )),
+        ],
+      ),
+    );
+  }
+
+
+  Widget actionItem(ChatAction action) {
+    switch (action) {
+      case ChatAction.location:
+        {
+          return extentionAction(Icons.location_on, () {});
+        }
+      case ChatAction.voice:
+        {
+          return extentionAction(Icons.mic, () {});
+        }
+      case ChatAction.picture:
+        {
+          return extentionAction(Icons.image, () {});
+        }
+      case ChatAction.attach:
+        {
+          return extentionAction(Icons.attach_file, () {});
+        }
+      case ChatAction.text:
+        {
+          return Expanded(
+            flex: 5,
+            child: Container(
+              child: TextField(
+                autofocus: true,
+                controller: textController,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (text){
+                  setState(() {
+                    messages.add(MessageModel(
+                      messageForm: MessageForm.owner,
+                      content: text,
+                      type: MessageType.text
+                    ));
+                    textController.text = "";
+                  });
+                  chatController.animateTo(chatController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                },
+                style: TextStyle(
+                  color: Colors.white
+                ),
+                decoration: InputDecoration(
+                  hintText: "Aa",
+                  hintStyle: TextStyle(
+                    color: Colors.white
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(90))
+                  )
+                ),
               ),
             ),
+          );
+        }
+      case ChatAction.send:
+        {
+          return extentionAction(Icons.send, () {});
+        }
+        default:
+        return Text("No action");
+    }
+  }
+
+  Widget extentionAction(IconData icon, Function onClick) {
+    return Expanded(
+      flex: 1,
+      child: FlatButton(
+        onPressed: () {},
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Icon(
+            icon,
+            color: AppColor.actionColor,
+            size: 32,
           ),
-          Spacer(),
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xff71D698)
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
