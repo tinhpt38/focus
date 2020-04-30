@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/ui/base/responsive.dart';
-import 'package:focus_app/ui/modules/home/widgets/navigator/navigator.dart';
-import 'package:focus_app/ui/modules/home/widgets/users/users.dart';
+import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -29,26 +28,50 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
   @override
   Widget buildTablet(BuildContext context) {
     return Container(
+      color: Color(0xff363E48),
       child: Row(
         children: [
-          Expanded(flex: 1, child: MainNavigator()),
           Expanded(
-              flex: 3,
+              flex: 2,
               child: Column(
                 children: [
                   Container(
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                        borderRadius: BorderRadius.all(Radius.circular(90))),
+                    color: Colors.black38,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(4),
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              color: Colors.black, shape: BoxShape.circle),
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.orange,
+                              ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            "tinhpt",
+                            style: TextStyle(
+                              color: Colors.white
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Expanded(
                     child: ListView(
                       children: [
-                        Users(),
-                        Users(),
-                        Users(),
-                        Users(),
+                        Chat(),
+                        Chat(),
+                        Chat(),
+                        Chat(),
                       ],
                     ),
                   ),

@@ -8,6 +8,8 @@ class MainNavigator extends StatefulWidget {
 }
 
 class _MainNavigatorState extends State<MainNavigator> {
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -21,15 +23,30 @@ class _MainNavigatorState extends State<MainNavigator> {
               color: Colors.white
             ),
             child: Icon(
-              Icons.people,
+              Icons.person,
               size: 64,
             ),
           ),
-            NaviItem(),
-            NaviItem(),
-            NaviItem(),
+            NaviItem(
+              icon: Icons.message,
+              onSelect: (_isSelect){},
+              isSelect: true,
+              isNotification: true,
+            ),
+            NaviItem(
+              icon: Icons.person,
+              onSelect: (_isSelect){},
+              isNotification: true,
+            ),
+            NaviItem(
+              icon: Icons.group_add,
+              onSelect: (_isSelect){},
+            ),
             Spacer(),
-            NaviItem(),
+            NaviItem(
+              icon: Icons.leak_remove,
+              onSelect: (_isSelect){},
+            ),
         ],
       ),      
     );
