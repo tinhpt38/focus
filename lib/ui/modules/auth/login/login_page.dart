@@ -4,7 +4,8 @@ import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/base_page.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/base/text_field.dart';
-import 'package:focus_app/ui/modules/auth/login/login_model.dart';
+import 'package:focus_app/ui/modules/auth/auth_model.dart';
+import 'package:focus_app/ui/modules/auth/register/register_page.dart';
 import 'package:focus_app/ui/modules/home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with ResponsivePage {
   TextEditingController _userNameController = TextEditingController();
   TextEditingController _pwdController = TextEditingController();
-  LoginModel _model;
+  AuthModel _model;
 
 
   @override
@@ -27,11 +28,12 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage<LoginModel>(
-      model: LoginModel(),
+    return BasePage<AuthModel>(
+      model: AuthModel(),
       builder: (context, model, child) {
         _model = model;
         return Scaffold(
+          backgroundColor: AppColor.background,
             body: Stack(
           children: [
             buildUi(context),
@@ -51,7 +53,7 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
   onLoginClick() async {
     await _model.login(
         _userNameController.text.trim(), _pwdController.text.trim());
-    if (_model.loginSuccess) {
+    if (_model.success) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -64,8 +66,9 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
           return Dialog(
             child: Container(
               color: Colors.white,
-              height:  MediaQuery.of(context).size.height * (1/3),
-              alignment: Alignment.centerLeft,
+              height: MediaQuery.of(context).size.height *(1/10),
+              padding: EdgeInsets.all(24),
+              alignment: Alignment.center,
               child: Text(
                 _model.errorMessage
               ),
@@ -264,7 +267,11 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               child: RaisedButton(
                                 color: Colors.white,
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) => RegisterPage(),
+                                  ));
+                                },
                                 shape: RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(90))),
