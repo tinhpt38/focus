@@ -49,13 +49,19 @@ class _ChatFlowState extends State<ChatFlow> {
   FocusNode textNode;
 
   TextEditingController textController = TextEditingController();
-  ScrollController chatController = ScrollController();
+  ScrollController chatController;
 
 
   @override
   void initState() {
     super.initState();
     textNode = FocusNode();
+     chatController = ScrollController();
+     chatController.addListener(_scrollController);
+  }
+
+  _scrollController(){
+chatController.animateTo(chatController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
   @override
@@ -159,7 +165,6 @@ class _ChatFlowState extends State<ChatFlow> {
                     ));
                     textController.text = "";
                   });
-                  chatController.animateTo(chatController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                 },
                 style: TextStyle(
                   color: Colors.white

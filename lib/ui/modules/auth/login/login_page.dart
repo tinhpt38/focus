@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:focus_app/ui/base/base_page.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/base/text_field.dart';
+import 'package:focus_app/ui/modules/auth/login/login_model.dart';
 import 'package:focus_app/ui/modules/home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,25 +15,70 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with ResponsivePage {
   TextEditingController _userNameController = TextEditingController();
   TextEditingController _pwdController = TextEditingController();
+  LoginModel _model;
+
+
+  @override
+  void initState() {
+    _userNameController.text = "haihuynhngoc24";
+    _pwdController.text = "123244";
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: buildUi(context));
+    return BasePage<LoginModel>(
+      model: LoginModel(),
+      builder: (context, model, child) {
+        _model = model;
+        return Scaffold(
+            body: Stack(
+          children: [
+            buildUi(context),
+            Visibility(
+              visible: model.busy,
+              child: Container(
+                alignment: Alignment.center,
+                  color: Colors.black12,
+                  child: CircularProgressIndicator()),
+            )
+          ],
+        ));
+      },
+    );
   }
 
-  onLoginClick(){
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) => HomePage(),
-    ));
+  onLoginClick() async {
+    await _model.login(
+        _userNameController.text.trim(), _pwdController.text.trim());
+    if (_model.loginSuccess) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ));
+    } else {
+      showDialog(
+        context: context,
+        builder: (context){
+          return Dialog(
+            child: Container(
+              color: Colors.white,
+              height:  MediaQuery.of(context).size.height * (1/3),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _model.errorMessage
+              ),
+            ),
+          );
+        }
+      );
+    }
   }
 
   @override
   Widget buildDesktop(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      color: Colors.red,
-      child: Text("UI Desktop"),
-    );
+    return buildTablet(context);
   }
 
   @override
@@ -57,7 +104,7 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
               Container(
                 padding: const EdgeInsets.only(top: 24),
                 child: Text(
-                  "Welcome to Focus",
+                  "Welcome to Homie",
                   style: TextStyle(
                       fontSize: 42, color: Colors.white, fontFamily: 'Gotu'),
                 ),
@@ -280,7 +327,7 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
               Container(
                 padding: const EdgeInsets.only(top: 24),
                 child: Text(
-                  "Welcome to Focus",
+                  "Welcome to Homie",
                   style: TextStyle(
                       fontSize: 42, color: Colors.white, fontFamily: 'Gotu'),
                 ),
