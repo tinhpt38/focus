@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
@@ -22,47 +20,51 @@ class ChatFlow extends StatefulWidget {
 }
 
 class _ChatFlowState extends State<ChatFlow> {
-
-
   List<MessageModel> messages = [
     MessageModel(
-      type: MessageType.text,
-      content: textTest1,
-      messageForm: MessageForm.homie
-    ),
+        type: MessageType.text,
+        content: textTest1,
+        messageForm: MessageForm.homie),
     MessageModel(
-      type: MessageType.text,
-      content: textTest1,
-      messageForm: MessageForm.owner
-    ),
+        type: MessageType.text,
+        content: textTest1,
+        messageForm: MessageForm.owner),
     MessageModel(
-      type: MessageType.text,
-      content: textTest1,
-      messageForm: MessageForm.owner
-    ),
+        type: MessageType.text,
+        content: textTest1,
+        messageForm: MessageForm.owner),
     MessageModel(
-      type: MessageType.text,
-      content: textTest1,
-      messageForm: MessageForm.homie
-    ),
+        type: MessageType.text,
+        content: textTest1,
+        messageForm: MessageForm.homie),
   ];
   FocusNode textNode;
 
   TextEditingController textController = TextEditingController();
   ScrollController chatController;
 
-
   @override
   void initState() {
-    super.initState();
     textNode = FocusNode();
-     chatController = ScrollController();
-     chatController.addListener(_scrollController);
+    chatController = ScrollController();
+    super.initState();
   }
 
-  _scrollController(){
-chatController.animateTo(chatController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+ void scrollToEnd() {
+  if (!chatController.hasClients) {
+    return;
   }
+
+  var scrollPosition = chatController.position;
+
+  if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
+    chatController.animateTo(
+      scrollPosition.maxScrollExtent + 100,
+      duration: new Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+}
 
   @override
   void dispose() {
@@ -72,15 +74,13 @@ chatController.animateTo(chatController.position.maxScrollExtent, duration: Dura
 
   @override
   Widget build(BuildContext context) {
-    textNode.requestFocus();
     return Container(
       child: Column(
         children: [
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-                color: Colors.black38),
+            decoration: BoxDecoration(color: Colors.black38),
             child: Row(
               children: [
                 Container(
@@ -92,24 +92,22 @@ chatController.animateTo(chatController.position.maxScrollExtent, duration: Dura
                   ),
                   child: Icon(Icons.people),
                 ),
-                Text("NO 1",
-                style: TextStyle(
-                  color: Colors.white
-                ),)
+                Text(
+                  "NO 1",
+                  style: TextStyle(color: Colors.white),
+                )
               ],
             ),
           ),
           Expanded(
             child: ListView.builder(
-              shrinkWrap: true,
-              reverse: false,
               controller: chatController,
               itemCount: messages.length,
               itemBuilder: (context, index){
                 return Message(messages[index]);
               },
+            )
             ),
-          ),
           Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               width: double.infinity,
@@ -127,7 +125,6 @@ chatController.animateTo(chatController.position.maxScrollExtent, duration: Dura
       ),
     );
   }
-
 
   Widget actionItem(ChatAction action) {
     switch (action) {
@@ -156,28 +153,23 @@ chatController.animateTo(chatController.position.maxScrollExtent, duration: Dura
                 autofocus: true,
                 controller: textController,
                 textInputAction: TextInputAction.done,
-                onSubmitted: (text){
+                onSubmitted: (text) {
+
                   setState(() {
                     messages.add(MessageModel(
-                      messageForm: MessageForm.owner,
-                      content: text,
-                      type: MessageType.text
-                    ));
+                        messageForm: MessageForm.owner,
+                        content: text,
+                        type: MessageType.text));
                     textController.text = "";
                   });
+                  scrollToEnd();
                 },
-                style: TextStyle(
-                  color: Colors.white
-                ),
+                style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: "Aa",
-                  hintStyle: TextStyle(
-                    color: Colors.white
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(90))
-                  )
-                ),
+                    hintText: "Aa",
+                    hintStyle: TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(90)))),
               ),
             ),
           );
@@ -186,7 +178,7 @@ chatController.animateTo(chatController.position.maxScrollExtent, duration: Dura
         {
           return extentionAction(Icons.send, () {});
         }
-        default:
+      default:
         return Text("No action");
     }
   }

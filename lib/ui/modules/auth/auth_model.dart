@@ -5,7 +5,7 @@ import 'package:focus_app/ui/base/base_page_model.dart';
 import 'package:focus_app/ui/base/share_key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginModel extends PageModel {
+class AuthModel extends PageModel {
   User _user;
   User get user => _user;
   Api _api = Api();
@@ -13,7 +13,7 @@ class LoginModel extends PageModel {
   String get errorMessage => _errorMessage;
   String _token = "";
   bool _loginSuccess = false;
-  bool get loginSuccess => _loginSuccess;
+  bool get success => _loginSuccess;
 
   setLoginSuccess(bool value){
     _loginSuccess = value;
@@ -45,4 +45,19 @@ class LoginModel extends PageModel {
     preferences.setString(ShareKey.token, _token);
     setBusy(false);
   }
+
+  register(User user) async {
+    setBusy(true);
+    await _api.register(user: user,
+    onError: setError,
+    onSuccess: (user,token){
+      _token = token;
+      setUser(user);
+      setLoginSuccess(true);
+    });
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString(ShareKey.token, _token);
+    setBusy(false);
+  }
+
 }
