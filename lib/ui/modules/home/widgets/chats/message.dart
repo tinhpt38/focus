@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:focus_app/ui/base/responsive.dart';
 
 enum MessageForm { owner, homie }
 
@@ -13,7 +14,7 @@ class Message extends StatefulWidget {
   _MessageState createState() => _MessageState();
 }
 
-class _MessageState extends State<Message> {
+class _MessageState extends State<Message>{
 
   
   bool isOwner;
@@ -67,11 +68,12 @@ class _MessageState extends State<Message> {
   }
 
   Widget buildMessage(Size size, MessageModel message) {
-    EdgeInsets margin = isOwner? EdgeInsets.only(left: size.width * (1 / 4)): EdgeInsets.only(right: size.width * (1 / 4));
+    Alignment alignment = isOwner? Alignment.centerRight : Alignment.centerLeft;
+    EdgeInsets margin = isOwner? EdgeInsets.only(left: 32) :  EdgeInsets.only(right: 32);
     return Expanded(
       child: Container(
           margin: margin,
-          alignment: Alignment.center,
+          alignment: alignment,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
               color: AppColor.messageBg,
@@ -90,4 +92,5 @@ class _MessageState extends State<Message> {
         return Text(message.content, textAlign: TextAlign.start);
     }
   }
+
 }

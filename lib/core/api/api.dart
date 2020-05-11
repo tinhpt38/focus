@@ -41,8 +41,12 @@ class Api {
       Function(User, String) onSuccess,
       Function(String) onError}) async {
     String url = '$endpoint/auth/signup';
-    Map<String, dynamic> body = user.toJson();
-    body['confirm_password'] = user.password;
+    Map<String, dynamic> body = {
+      "username": user.userName,
+      "fullName": user.fullName,
+      "password":  user.password,
+      "confirmPassword": user.password
+    };
     var res = await http.post(url, body: body);
     if (res.statusCode == 200) {
       try {
@@ -60,10 +64,10 @@ class Api {
       } catch (e) {
         onError('Something get wrong! try again.');
       }
-    } else if(res.statusCode == 400){
+    } else if (res.statusCode == 400) {
       dynamic jsonRes = json.decode(res.body);
       onError(jsonRes['message']);
-    }else{
+    } else {
       onError('Something get wrong! try again.');
     }
   }
