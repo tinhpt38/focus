@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:focus_app/core/api/api.dart';
 import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/base_page_model.dart';

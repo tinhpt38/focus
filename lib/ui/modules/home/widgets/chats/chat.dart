@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/common.dart';
+import 'package:focus_app/ui/modules/home/home_model.dart';
+import 'package:focus_app/ui/modules/home/home_page.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
+import 'package:provider/provider.dart';
 
 enum ChatAction { location, voice, picture, attach, text, send }
 List<ChatAction> chatActions = [
@@ -20,28 +23,11 @@ class ChatFlow extends StatefulWidget {
 }
 
 class _ChatFlowState extends State<ChatFlow> {
-  List<MessageModel> messages = [
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.homie),
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.owner),
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.owner),
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.homie),
-  ];
   FocusNode textNode;
 
   TextEditingController textController = TextEditingController();
   ScrollController chatController;
+  HomeModel _model;
 
   @override
   void initState() {
@@ -50,21 +36,21 @@ class _ChatFlowState extends State<ChatFlow> {
     super.initState();
   }
 
- void scrollToEnd() {
-  if (!chatController.hasClients) {
-    return;
-  }
+  void scrollToEnd() {
+    if (!chatController.hasClients) {
+      return;
+    }
 
-  var scrollPosition = chatController.position;
+    var scrollPosition = chatController.position;
 
-  if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
-    chatController.animateTo(
-      scrollPosition.maxScrollExtent + 100,
-      duration: new Duration(milliseconds: 100),
-      curve: Curves.easeOut,
-    );
+    if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
+      chatController.animateTo(
+        scrollPosition.maxScrollExtent + 100,
+        duration: new Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
+    }
   }
-}
 
   @override
   void dispose() {
@@ -74,55 +60,60 @@ class _ChatFlowState extends State<ChatFlow> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(color: Colors.black38),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  margin: EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColor.actionColor,
-                  ),
-                  child: Icon(Icons.people),
+    return Consumer<HomeModel>(
+      builder: (context, model, child) {
+        _model = model;
+        return Container(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(color: Colors.black38),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      margin: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColor.actionColor,
+                      ),
+                      child: Icon(Icons.people),
+                    ),
+                    Text(
+                      "NO 1",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
                 ),
-                Text(
-                  "NO 1",
-                  style: TextStyle(color: Colors.white),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              controller: chatController,
-              itemCount: messages.length,
-              itemBuilder: (context, index){
-                return Message(messages[index]);
-              },
-            )
-            ),
-          Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.black38,
               ),
-              child: Row(
-                children: chatActions
-                    .asMap()
-                    .map((key, action) => MapEntry(action, actionItem(action)))
-                    .values
-                    .toList(),
+              Expanded(
+                  child: ListView.builder(
+                controller: chatController,
+                itemCount: model.messages.length,
+                itemBuilder: (context, index) {
+                  return Message(model.messages[index]);
+                },
               )),
-        ],
-      ),
+              Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black38,
+                  ),
+                  child: Row(
+                    children: chatActions
+                        .asMap()
+                        .map((key, action) =>
+                            MapEntry(action, actionItem(action)))
+                        .values
+                        .toList(),
+                  )),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -154,9 +145,8 @@ class _ChatFlowState extends State<ChatFlow> {
                 controller: textController,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (text) {
-
                   setState(() {
-                    messages.add(MessageModel(
+                    _model.messages.add(MessageModel(
                         messageForm: MessageForm.owner,
                         content: text,
                         type: MessageType.text));

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:focus_app/ui/base/base_page.dart';
+import 'package:focus_app/ui/base/navigation_horizontal_retail_destination.dart';
+import 'package:focus_app/ui/base/navigation_retail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
+import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
-import 'package:focus_app/ui/modules/home/widgets/chats/chat_id.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,11 +13,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with ResponsivePage {
-  
+  HomeModel _model;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: buildUi(context),
+    return BasePage<HomeModel>(
+      model: _model == null ? HomeModel() : _model,
+      builder: (context, model, child) {
+        _model = model;
+        return Scaffold(
+          body: buildUi(context),
+        );
+      },
     );
   }
 
@@ -48,18 +58,16 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                               color: Colors.black, shape: BoxShape.circle),
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.orange,
-                              ),
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.orange,
+                          ),
                         ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
                             "tinhpt",
-                            style: TextStyle(
-                              color: Colors.white
-                            ),
+                            style: TextStyle(color: Colors.white),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -68,13 +76,20 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                     ),
                   ),
                   Expanded(
-                    child: ListView(
-                      children: [
-                        ChatID(),
-                        ChatID(),
-                        ChatID(),
-                        ChatID(),
-                      ],
+                    child: NavigationHorizontalRetail(
+                      backgroundColor: AppColor.background,
+                      selectedColor: AppColor.actionColor,
+                      selectedIndex: _model.indexSelected,
+                      onChangeSelectedIndex: (index) {
+                        _model.getMessageForUser(index);
+                      },
+                      destinations: _model.users
+                          .map((e) => NavigationHorizontalRetailDestination(
+                                title: e,
+                                icon: Container(
+                                  child: Icon(Icons.people),
+                                ),
+                              )).toList(),
                     ),
                   ),
                 ],
