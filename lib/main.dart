@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/ui/modules/auth/login/login_page.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,7 +10,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Focus',
+      debugShowCheckedModeBanner: false,
+      title: 'Homie',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

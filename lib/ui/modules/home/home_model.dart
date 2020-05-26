@@ -29,6 +29,8 @@ class HomeModel extends PageModel{
         content: textTest1,
         messageForm: MessageForm.homie),
   ];
+  List<String> _userSearch = List();
+  List<String> get userSearch => _userSearch;
 
   setUsers(List<String> value){
     _users = value;
@@ -39,4 +41,18 @@ class HomeModel extends PageModel{
     _indexSelected = index;
     notifyListeners();
   }
+  
+  searchUser(String text){
+    List<String> values = List();
+     _users.forEach((e){
+      if(e.toLowerCase().contains(text.toLowerCase())){
+        values.add(e);
+      }
+    });
+    _userSearch = values;
+    notifyListeners();
+  }
+
+
+  
 }

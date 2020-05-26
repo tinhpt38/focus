@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/base_page.dart';
-import 'package:focus_app/ui/base/navigation_horizontal_retail_destination.dart';
-import 'package:focus_app/ui/base/navigation_retail.dart';
+import 'package:focus_app/ui/base/common_function.dart';
+import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
+import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with ResponsivePage {
   HomeModel _model;
+  TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
   @override
   Widget buildTablet(BuildContext context) {
     return Container(
-      color: Color(0xff363E48),
+      color: AppColor.headerColor,
       child: Row(
         children: [
           Expanded(
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                     ),
                   ),
                   Expanded(
-                    child: NavigationHorizontalRetail(
+                    child: NavigationHorizontalRail(
                       backgroundColor: AppColor.background,
                       selectedColor: AppColor.actionColor,
                       selectedIndex: _model.indexSelected,
@@ -84,12 +86,28 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                         _model.getMessageForUser(index);
                       },
                       destinations: _model.users
-                          .map((e) => NavigationHorizontalRetailDestination(
-                                title: e,
-                                icon: Container(
-                                  child: Icon(Icons.people),
+                          .map((e) => NavigationHorizontalRailDestination(
+                                padding: EdgeInsets.symmetric(vertical: 8),
+                                title: Container(
+                                  child: Text(e,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      )),
                                 ),
-                              )).toList(),
+                                icon: Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: Text(e.substring(0, 1).toUpperCase(),
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16))),
+                              ))
+                          .toList(),
                     ),
                   ),
                 ],
@@ -104,7 +122,81 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
           Expanded(
             flex: 3,
             child: Container(
-              color: Colors.orange,
+              color: AppColor.background,
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    color: Colors.black38,
+                    width: double.infinity,
+                    child: TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(90)),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.white),
+                      onChanged: (text) {
+                        print("text $text");
+                        _model.searchUser(text);
+                      },
+                    ),
+                  ),
+                  Expanded(
+                      child: ListView.builder(
+                          itemCount: _model.userSearch.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              color: Colors.white,
+                              margin: EdgeInsets.symmetric(vertical:5),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white,
+                                      ),
+                                      child: Text(
+                                          _model.userSearch[index]
+                                              .substring(0, 1)
+                                              .toUpperCase(),
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16))),
+                                  Container(
+                                    child: Text(_model.userSearch[index],
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                        )),
+                                  ),
+
+                                  MaterialButton(
+                                    onPressed: (){},
+                                    child: Container(
+                                      padding: EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColor.actionColor
+                                      ),
+                                      child: Icon(
+                                      Icons.add
+                                    ),
+                                    )
+                                  ),
+                                ],
+                              ),
+                            );
+                          }))
+                ],
+              ),
             ),
           ),
         ],

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:focus_app/ui/base/navigation_horizontal_retail_destination.dart';
+import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
 
-class NavigationHorizontalRetail extends StatefulWidget {
+class NavigationHorizontalRail extends StatefulWidget {
   final Color backgroundColor;
   final Color selectedColor;
   final Function(int) onChangeSelectedIndex;
   final int selectedIndex;
-  final List<NavigationHorizontalRetailDestination> destinations;
+  final List<NavigationHorizontalRailDestination> destinations;
 
-  NavigationHorizontalRetail(
+  NavigationHorizontalRail(
       {this.backgroundColor,
       this.onChangeSelectedIndex,
       this.destinations,
@@ -16,14 +16,14 @@ class NavigationHorizontalRetail extends StatefulWidget {
       this.selectedIndex});
 
   @override
-  _NavigationHorizontalRetailState createState() =>
-      _NavigationHorizontalRetailState();
+  _NavigationHorizontalRailState createState() =>
+      _NavigationHorizontalRailState();
 }
 
-class _NavigationHorizontalRetailState
-    extends State<NavigationHorizontalRetail> {
-  int indexSelected = -1;
+class _NavigationHorizontalRailState
+    extends State<NavigationHorizontalRail> {
 
+  int indexSelected = -1;
 
   @override
   void initState() {
