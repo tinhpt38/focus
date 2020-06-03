@@ -1,11 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
-import 'package:focus_app/ui/base/common.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
-import 'package:focus_app/ui/modules/home/home_page.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 enum ChatAction { location, voice, picture, attach, text, send }
 List<ChatAction> chatActions = [
@@ -129,7 +130,16 @@ class _ChatFlowState extends State<ChatFlow> {
         }
       case ChatAction.picture:
         {
-          return extentionAction(Icons.image, () {});
+          return extentionAction(Icons.image, () async {
+            if (Platform.isIOS || Platform.isAndroid) {
+              File file = await FilePicker.getFile();
+              _model.addMessage(MessageType.media, file);
+            }else if(Platform.isMacOS || Platform.isWindows || Platform.isLinux){
+              print("Don't support yet!");
+            }else{
+              //TODO: platform web
+            }
+          });
         }
       case ChatAction.attach:
         {
@@ -177,7 +187,7 @@ class _ChatFlowState extends State<ChatFlow> {
     return Expanded(
       flex: 1,
       child: FlatButton(
-        onPressed: () {},
+        onPressed: onClick,
         child: AspectRatio(
           aspectRatio: 1,
           child: Icon(

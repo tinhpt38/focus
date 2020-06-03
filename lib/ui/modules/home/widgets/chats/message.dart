@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
-import 'package:focus_app/ui/base/responsive.dart';
 
 enum MessageForm { owner, homie }
 
@@ -14,12 +15,8 @@ class Message extends StatefulWidget {
   _MessageState createState() => _MessageState();
 }
 
-class _MessageState extends State<Message>{
-
-  
+class _MessageState extends State<Message> {
   bool isOwner;
-
-
 
   @override
   void initState() {
@@ -33,7 +30,8 @@ class _MessageState extends State<Message>{
     return Container(
       margin: EdgeInsets.symmetric(vertical: 24),
       child: Row(
-        mainAxisAlignment: isOwner? MainAxisAlignment.end: MainAxisAlignment.start,
+        mainAxisAlignment:
+            isOwner ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           Visibility(
             visible: !isOwner,
@@ -68,8 +66,10 @@ class _MessageState extends State<Message>{
   }
 
   Widget buildMessage(Size size, MessageModel message) {
-    Alignment alignment = isOwner? Alignment.centerRight : Alignment.centerLeft;
-    EdgeInsets margin = isOwner? EdgeInsets.only(left: 32) :  EdgeInsets.only(right: 32);
+    Alignment alignment =
+        isOwner ? Alignment.centerRight : Alignment.centerLeft;
+    EdgeInsets margin =
+        isOwner ? EdgeInsets.only(left: 32) : EdgeInsets.only(right: 32);
     return Expanded(
       child: Container(
           margin: margin,
@@ -85,12 +85,22 @@ class _MessageState extends State<Message>{
   Widget buildMessageype(MessageModel message) {
     switch (message.type) {
       case MessageType.text:
-        return Text(message.content, textAlign: TextAlign.start);
-      case MessageType.picture:
-        return Image.network(message.content,fit: BoxFit.fill,);
+        {
+          return Text(message.content, textAlign: TextAlign.start);
+        }
+      case MessageType.media:
+        {
+          if (message.content is File) {
+            return Image.file(message.content);
+          }
+          return Image.network(
+            message.content,
+            fit: BoxFit.fill,
+          );
+        }
+
       default:
         return Text(message.content, textAlign: TextAlign.start);
     }
   }
-
 }

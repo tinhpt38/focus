@@ -52,6 +52,14 @@ class HomeModel extends PageModel{
     _userSearch = values;
     notifyListeners();
   }
+  addMessage(MessageType type, dynamic content){
+    messages.add(MessageModel(
+      type:type,
+      content: content,
+      messageForm: MessageForm.owner
+    ));
+    notifyListeners();
+  }
 
 
   
