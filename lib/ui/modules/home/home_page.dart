@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/base_page.dart';
-import 'package:focus_app/ui/base/common_function.dart';
 import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
 import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
@@ -70,7 +69,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                           margin: EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
                             "tinhpt",
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white, fontFamily: 'Gotu'),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -93,6 +92,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                   child: Text(e,
                                       style: TextStyle(
                                         color: Colors.white,
+                                        fontFamily: 'Gotu'
                                       )),
                                 ),
                                 icon: Container(
@@ -106,7 +106,8 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                         style: TextStyle(
                                             color: Colors.grey,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 16))),
+                                            fontSize: 16,
+                                            fontFamily: 'Gotu'))),
                               ))
                           .toList(),
                     ),
