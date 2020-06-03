@@ -1,8 +1,9 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:file_access/file_access.dart';
 
 enum MessageForm { owner, homie }
 
@@ -90,15 +91,21 @@ class _MessageState extends State<Message> {
         }
       case MessageType.media:
         {
-          if (message.content is File) {
-            return Image.file(message.content);
-          }
-          return Image.network(
-            message.content,
-            fit: BoxFit.fill,
+          try {
+            return FutureBuilder<List<int>>(
+                future: message.content.readAsBytes(),
+                builder: (context, snapshot) {
+                  final _bytes = Uint8List.fromList(snapshot.data);
+                  return Image.memory(
+                    _bytes,
+                    fit: BoxFit.contain,
+                  );
+                });
+          } catch (_) {}
+          return Container(
+            child: Icon(Icons.error),
           );
         }
-
       default:
         return Text(message.content, textAlign: TextAlign.start);
     }
