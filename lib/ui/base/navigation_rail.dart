@@ -4,6 +4,7 @@ import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
 class NavigationHorizontalRail extends StatefulWidget {
   final Color backgroundColor;
   final Color selectedColor;
+  final Color splashColor;
   final Function(int) onChangeSelectedIndex;
   final int selectedIndex;
   final List<NavigationHorizontalRailDestination> destinations;
@@ -13,6 +14,7 @@ class NavigationHorizontalRail extends StatefulWidget {
       this.onChangeSelectedIndex,
       this.destinations,
       this.selectedColor,
+      this.splashColor = Colors.red,
       this.selectedIndex});
 
   @override
@@ -38,6 +40,7 @@ class _NavigationHorizontalRailState
         child: ListView.builder(
           itemCount: widget.destinations.length,
           itemBuilder: (context, index) => FlatButton(
+            splashColor: widget.splashColor,
             color: indexSelected == index
                 ? widget.selectedColor
                 : Colors.transparent,

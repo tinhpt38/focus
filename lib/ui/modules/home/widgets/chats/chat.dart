@@ -59,15 +59,17 @@ class _ChatFlowState extends State<ChatFlow> {
   }
 
   void addMessage(String text) {
-    MessageType mst =
-        text.contains("http") ? MessageType.link : MessageType.text;
-    setState(() {
-      _model.messages.add(MessageModel(
-          messageForm: MessageForm.owner, content: text, type: mst));
-      textController.text = "";
-    });
-    textNode.requestFocus();
-    scrollToEnd();
+    if (text.isNotEmpty) {
+      MessageType mst =
+          text.contains("http") ? MessageType.link : MessageType.text;
+      setState(() {
+        _model.messages.add(MessageModel(
+            messageForm: MessageForm.owner, content: text, type: mst));
+        textController.text = "";
+      });
+      textNode.requestFocus();
+      scrollToEnd();
+    }
   }
 
   @override
@@ -95,7 +97,7 @@ class _ChatFlowState extends State<ChatFlow> {
                     ),
                     Text(
                       "NO 1",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white,fontFamily: 'Gotu'),
                     )
                   ],
                 ),
@@ -191,13 +193,11 @@ class _ChatFlowState extends State<ChatFlow> {
       flex: 1,
       child: FlatButton(
         onPressed: onClick,
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: Icon(
-            icon,
-            color: AppColor.actionColor,
-            size: 32,
-          ),
+        splashColor: Colors.red,
+        child: Icon(
+          icon,
+          color: AppColor.actionColor,
+          size: 32,
         ),
       ),
     );

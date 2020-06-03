@@ -7,6 +7,7 @@ import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
+import 'package:focus_app/ui/modules/home/widgets/search_user/user_item.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -115,86 +116,63 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
           Expanded(
             flex: 6,
             child: Container(
-              color: AppColor.background,
+              decoration: BoxDecoration(
+                  color: AppColor.background,
+                  border:
+                      Border(left: BorderSide(color: Colors.white, width: 1))),
               child: ChatFlow(),
             ),
           ),
           Expanded(
             flex: 3,
             child: Container(
-              color: AppColor.background,
+              decoration: BoxDecoration(
+                  color: AppColor.background,
+                  border:
+                      Border(left: BorderSide(color: Colors.white, width: 1))),
               child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    margin: EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 8),
                     color: Colors.black38,
                     width: double.infinity,
                     child: TextFormField(
                       controller: searchController,
                       decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: "Search User",
+                        hintStyle: TextStyle(
+                            color: AppColor.background,
+                            fontFamily: 'Gotu',
+                            fontSize: 14),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(90)),
-                          borderSide: BorderSide(color: Colors.black, width: 2),
+                          borderSide:
+                              BorderSide(color: AppColor.actionColor, width: 2),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: AppColor.background, fontFamily: 'Gotu'),
                       onChanged: (text) {
-                        print("text $text");
                         _model.searchUser(text);
                       },
                     ),
                   ),
                   Expanded(
-                      child: ListView.builder(
-                          itemCount: _model.userSearch.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              color: Colors.white,
-                              margin: EdgeInsets.symmetric(vertical:5),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.white,
-                                      ),
-                                      child: Text(
-                                          _model.userSearch[index]
-                                              .substring(0, 1)
-                                              .toUpperCase(),
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16))),
-                                  Container(
-                                    child: Text(_model.userSearch[index],
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                        )),
-                                  ),
-
-                                  MaterialButton(
-                                    onPressed: (){},
-                                    child: Container(
-                                      padding: EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: AppColor.actionColor
-                                      ),
-                                      child: Icon(
-                                      Icons.add
-                                    ),
-                                    )
-                                  ),
-                                ],
-                              ),
-                            );
-                          }))
+                      child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: ListView.builder(
+                        itemCount: _model.userSearch.length,
+                        itemBuilder: (context, index) {
+                          return UserItem(
+                            userName: _model.userSearch[index],
+                            onAddClick: () {},
+                          );
+                        }),
+                  ))
                 ],
               ),
             ),
