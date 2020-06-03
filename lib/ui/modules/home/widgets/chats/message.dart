@@ -1,8 +1,10 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:focus_app/ui/base/common.dart';
 
 enum MessageForm { owner, homie }
 
@@ -69,7 +71,7 @@ class _MessageState extends State<Message> {
     Alignment alignment =
         isOwner ? Alignment.centerRight : Alignment.centerLeft;
     EdgeInsets margin =
-        isOwner ? EdgeInsets.only(left: 32) : EdgeInsets.only(right: 32);
+        isOwner ? EdgeInsets.only(left: 42) : EdgeInsets.only(right: 42);
     return Expanded(
       child: Container(
           margin: margin,
@@ -77,30 +79,72 @@ class _MessageState extends State<Message> {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
               color: AppColor.messageBg,
-              borderRadius: BorderRadius.all(Radius.circular(32))),
-          child: buildMessageype(message)),
+              borderRadius: BorderRadius.all(Radius.circular(12))),
+          child: buildMessageype(size, message)),
     );
   }
 
-  Widget buildMessageype(MessageModel message) {
+  Widget buildMessageype(Size size, MessageModel message) {
     switch (message.type) {
       case MessageType.text:
         {
-          return Text(message.content, textAlign: TextAlign.start);
+          return SelectableText(message.content, textAlign: TextAlign.start);
         }
       case MessageType.media:
         {
-          if (message.content is File) {
-            return Image.file(message.content);
-          }
-          return Image.network(
-            message.content,
-            fit: BoxFit.fill,
+          try {
+            return FutureBuilder<List<int>>(
+                future: message.content.readAsBytes(),
+                builder: (context, snapshot) {
+                  final _bytes = Uint8List.fromList(snapshot.data);
+                  return Image.memory(
+                    _bytes,
+                    fit: BoxFit.contain,
+                  );
+                });
+          } catch (_) {}
+          return Container(
+            child: Icon(Icons.error),
           );
         }
+      case MessageType.link:
+        {
 
+          bool isImage = false;
+          imageExtentions.forEach((extention) { 
+            if(message.content.toString().toLowerCase().contains(extention)){
+              isImage = true;
+            }
+          });
+          if (isImage) {
+            try {
+              return CachedNetworkImage(
+                imageUrl: message.content,
+                imageBuilder: (context, imageProvider) {
+                  return SizedBox(
+                    child: Container(
+                      child: Image(
+                        image: imageProvider,
+                      ),
+                    ),
+                  );
+                },
+                placeholder: (context, _) {
+                  return Center(child: CircularProgressIndicator());
+                },
+                errorWidget: (context, url, errr) {
+                  return SelectableText(message.content,
+                      textAlign: TextAlign.start);
+                },
+              );
+            } catch (e) {
+              print("User Exception: ${e.toString()}");
+            }
+          }
+          return SelectableText(message.content, textAlign: TextAlign.start);
+        }
       default:
-        return Text(message.content, textAlign: TextAlign.start);
+        return SelectableText(message.content, textAlign: TextAlign.start);
     }
   }
 }
