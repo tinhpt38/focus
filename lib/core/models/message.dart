@@ -2,7 +2,8 @@
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
 
 enum MessageType{
-  location, voice, media, attach, text
+  location, voice, media, attach, text,
+  link
 }
 
 class MessageModel{
