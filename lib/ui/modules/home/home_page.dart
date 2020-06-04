@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/base_page.dart';
 import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
@@ -7,8 +8,13 @@ import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/user_item.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
+  final User user;
+
+  HomePage({this.user});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -20,7 +26,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
   @override
   Widget build(BuildContext context) {
     return BasePage<HomeModel>(
-      model: _model == null ? HomeModel() : _model,
+      model: _model == null ? HomeModel(user: widget.user) : _model,
       builder: (context, model, child) {
         _model = model;
         return Scaffold(
@@ -69,7 +75,8 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                           margin: EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
                             "tinhpt",
-                            style: TextStyle(color: Colors.white, fontFamily: 'Gotu'),
+                            style: TextStyle(
+                                color: Colors.white, fontFamily: 'Gotu'),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -91,9 +98,8 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                 title: Container(
                                   child: Text(e,
                                       style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'Gotu'
-                                      )),
+                                          color: Colors.white,
+                                          fontFamily: 'Gotu')),
                                 ),
                                 icon: Container(
                                     alignment: Alignment.center,
@@ -141,7 +147,8 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                     child: TextFormField(
                       controller: searchController,
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         filled: true,
                         fillColor: Colors.white,
                         hintText: "Search User",

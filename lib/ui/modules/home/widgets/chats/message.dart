@@ -2,33 +2,28 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
+import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:focus_app/ui/base/common.dart';
-
-enum MessageForm { owner, homie }
+import 'package:provider/provider.dart';
 
 class Message extends StatefulWidget {
   final MessageModel message;
+  final User user;
 
-  Message(this.message);
+  Message({this.user, this.message});
 
   @override
   _MessageState createState() => _MessageState();
 }
 
 class _MessageState extends State<Message> {
-  bool isOwner;
-
-  @override
-  void initState() {
-    isOwner = widget.message.messageForm == MessageForm.owner;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    bool isOwner = widget.message.idSender == widget.user.id;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 24),
       child: Row(
@@ -48,7 +43,7 @@ class _MessageState extends State<Message> {
               ),
             ),
           ),
-          buildMessage(size, widget.message),
+          buildMessage(size, widget.message, isOwner),
           Visibility(
             visible: isOwner,
             child: Container(
@@ -67,7 +62,7 @@ class _MessageState extends State<Message> {
     );
   }
 
-  Widget buildMessage(Size size, MessageModel message) {
+  Widget buildMessage(Size size, MessageModel message, bool isOwner) {
     Alignment alignment =
         isOwner ? Alignment.centerRight : Alignment.centerLeft;
     EdgeInsets margin =

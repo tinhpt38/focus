@@ -1,66 +1,57 @@
-
 import 'package:focus_app/core/models/message.dart';
+import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/base_page_model.dart';
 import 'package:focus_app/ui/base/common.dart';
-import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
+class HomeModel extends PageModel {
+  User _user;
+  User get user => _user;
 
-class HomeModel extends PageModel{
-  List<String> _users = [
-    "Mi","Hai","Lam","Bang","Ha","Hanh","Huy"
-  ];
+  List<String> _users = ["Mi", "Hai", "Lam", "Bang", "Ha", "Hanh", "Huy"];
   int _indexSelected = 0;
   int get indexSelected => _indexSelected;
   List<String> get users => _users;
-   List<MessageModel> messages = [
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.homie),
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.owner),
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.owner),
-    MessageModel(
-        type: MessageType.text,
-        content: textTest1,
-        messageForm: MessageForm.homie),
-  ];
+  List<MessageModel> messages = List();
   List<String> _userSearch = List();
   List<String> get userSearch => _userSearch;
 
-  setUsers(List<String> value){
+  HomeModel({User user}) {
+    _user = user;
+    messages = [
+      MessageModel(
+          type: MessageType.text, content: textTest1, idSender: user.id),
+      MessageModel(
+          type: MessageType.text, content: textTest1, idSender: "as i"),
+      MessageModel(
+          type: MessageType.text, content: textTest1, idSender: user.id),
+      MessageModel(
+          type: MessageType.text, content: textTest1, idSender: "as i"),
+    ];
+  }
+
+  setUsers(List<String> value) {
     _users = value;
     notifyListeners();
   }
 
-  getMessageForUser(int index)async{
+  getMessageForUser(int index) async {
     _indexSelected = index;
     notifyListeners();
   }
-  
-  searchUser(String text){
+
+  searchUser(String text) {
     List<String> values = List();
-     _users.forEach((e){
-      if(e.toLowerCase().contains(text.toLowerCase())){
+    _users.forEach((e) {
+      if (e.toLowerCase().contains(text.toLowerCase())) {
         values.add(e);
       }
     });
     _userSearch = values;
     notifyListeners();
   }
-  addMessage(MessageType type, dynamic content){
+
+  addMessage({MessageType type, dynamic content}) {
     messages.add(MessageModel(
-      type:type,
-      content: content,
-      messageForm: MessageForm.owner
-    ));
+        type: type, content: content, idSender: _user.id));
     notifyListeners();
   }
-
-
-  
 }

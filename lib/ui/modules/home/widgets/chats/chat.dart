@@ -63,8 +63,7 @@ class _ChatFlowState extends State<ChatFlow> {
       MessageType mst =
           text.contains("http") ? MessageType.link : MessageType.text;
       setState(() {
-        _model.messages.add(MessageModel(
-            messageForm: MessageForm.owner, content: text, type: mst));
+        _model.addMessage(content: text, type: mst);
         textController.text = "";
       });
       textNode.requestFocus();
@@ -107,7 +106,7 @@ class _ChatFlowState extends State<ChatFlow> {
                 controller: chatController,
                 itemCount: model.messages.length,
                 itemBuilder: (context, index) {
-                  return Message(model.messages[index]);
+                  return Message(message: model.messages[index],user: _model.user);
                 },
               )),
               Container(
@@ -146,7 +145,7 @@ class _ChatFlowState extends State<ChatFlow> {
           return extentionAction(Icons.image, () async {
             final _file = await pickImage();
             if (_file != null) {
-              _model.addMessage(MessageType.media, _file);
+              _model.addMessage(type:MessageType.media, content:_file);
             }
           });
         }
