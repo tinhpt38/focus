@@ -42,6 +42,7 @@ class AuthModel extends PageModel {
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setString(ShareKey.token, _token);
+    preferences.setString(ShareKey.uid, user.id);
     setBusy(false);
   }
 

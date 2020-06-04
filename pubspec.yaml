@@ -42,6 +42,7 @@ dev_dependencies:
   file_picker: ^1.9.0+1
   file_access: ^1.0.3
   cached_network_image: ^2.2.0+1
+  flutter_socket_io: ^0.6.0
 
 
 
