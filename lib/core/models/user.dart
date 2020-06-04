@@ -19,9 +19,11 @@ class User{
   final String website;
   @JsonKey(name:'_id')
   final String id;
+  @JsonKey(name: 'rooms')
+  final List<String> rooms;
 
 
-  User({this.userName, this.fullName, this.email, this.password, this.address, this.phone, this.website, this.id});
+  User({this.userName, this.fullName, this.email, this.password, this.address, this.phone, this.website, this.id, this.rooms});
 
 
   factory User.formJson(Map<String, dynamic> json) => _$UserFromJson(json);

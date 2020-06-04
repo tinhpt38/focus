@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/base_page.dart';
+import 'package:focus_app/ui/base/loading.dart';
 import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
 import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/user_item.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -23,6 +23,19 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
   HomeModel _model;
   TextEditingController searchController = TextEditingController();
 
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{ 
+      _model.setBusy(true);
+      Future.delayed(Duration(milliseconds: 500),(){
+  _model.setBusy(false);
+      });
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BasePage<HomeModel>(
@@ -30,7 +43,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
       builder: (context, model, child) {
         _model = model;
         return Scaffold(
-          body: buildUi(context),
+          body: model.busy? Loading(): buildUi(context),
         );
       },
     );
@@ -68,13 +81,13 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                               color: Colors.black, shape: BoxShape.circle),
                           child: Icon(
                             Icons.person,
-                            color: Colors.orange,
+                            color: Colors.white,
                           ),
                         ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
-                            "tinhpt",
+                            _model.rooms[_model.indexSelected].name??"",
                             style: TextStyle(
                                 color: Colors.white, fontFamily: 'Gotu'),
                             overflow: TextOverflow.ellipsis,
@@ -92,11 +105,11 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                       onChangeSelectedIndex: (index) {
                         _model.getMessageForUser(index);
                       },
-                      destinations: _model.users
+                      destinations: _model.rooms
                           .map((e) => NavigationHorizontalRailDestination(
                                 padding: EdgeInsets.symmetric(vertical: 8),
                                 title: Container(
-                                  child: Text(e,
+                                  child: Text(e.name??"",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontFamily: 'Gotu')),
@@ -108,7 +121,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
-                                    child: Text(e.substring(0, 1).toUpperCase(),
+                                    child: Text(e.name??"   ".substring(0, 1).toUpperCase(),
                                         style: TextStyle(
                                             color: Colors.grey,
                                             fontWeight: FontWeight.bold,
@@ -173,11 +186,13 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                       child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: ListView.builder(
-                        itemCount: _model.userSearch.length,
+                        itemCount: _model.userOnline.length,
                         itemBuilder: (context, index) {
                           return UserItem(
-                            userName: _model.userSearch[index],
-                            onAddClick: () {},
+                            userName: _model.userOnline[index].fullName,
+                            onAddClick: () async{
+                              await _model.createRoomWithUser(_model.userOnline[index].id);
+                            },
                           );
                         }),
                   ))

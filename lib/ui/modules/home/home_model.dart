@@ -1,35 +1,27 @@
 import 'package:focus_app/core/models/message.dart';
+import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/base_page_model.dart';
-import 'package:focus_app/ui/base/common.dart';
 class HomeModel extends PageModel {
   User _user;
   User get user => _user;
 
-  List<String> _users = ["Mi", "Hai", "Lam", "Bang", "Ha", "Hanh", "Huy"];
+  List<Room> _rooms = [
+    Room(),
+  ];
   int _indexSelected = 0;
   int get indexSelected => _indexSelected;
-  List<String> get users => _users;
+  List<Room> get rooms => _rooms;
   List<MessageModel> messages = List();
-  List<String> _userSearch = List();
-  List<String> get userSearch => _userSearch;
+  List<User> _userOnline = List();
+  List<User> get userOnline => _userOnline;
 
   HomeModel({User user}) {
     _user = user;
-    messages = [
-      MessageModel(
-          type: MessageType.text, content: textTest1, idSender: user.id),
-      MessageModel(
-          type: MessageType.text, content: textTest1, idSender: "as i"),
-      MessageModel(
-          type: MessageType.text, content: textTest1, idSender: user.id),
-      MessageModel(
-          type: MessageType.text, content: textTest1, idSender: "as i"),
-    ];
   }
 
-  setUsers(List<String> value) {
-    _users = value;
+  setRooms(List<Room> value) {
+    _rooms = value;
     notifyListeners();
   }
 
@@ -39,13 +31,13 @@ class HomeModel extends PageModel {
   }
 
   searchUser(String text) {
-    List<String> values = List();
-    _users.forEach((e) {
-      if (e.toLowerCase().contains(text.toLowerCase())) {
+    List<User> values = List();
+    _userOnline.forEach((e) {
+      if (e.fullName.toLowerCase().contains(text.toLowerCase())) {
         values.add(e);
       }
     });
-    _userSearch = values;
+    _userOnline = values;
     notifyListeners();
   }
 
@@ -53,5 +45,17 @@ class HomeModel extends PageModel {
     messages.add(MessageModel(
         type: type, content: content, idSender: _user.id));
     notifyListeners();
+  }
+
+  createRoomWithUser(String id)async{
+
+  }
+
+  getUserOnline()async{
+
+  }
+
+  connectAllRooms()async{
+
   }
 }

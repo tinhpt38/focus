@@ -95,7 +95,7 @@ class _ChatFlowState extends State<ChatFlow> {
                       child: Icon(Icons.people),
                     ),
                     Text(
-                      "NO 1",
+                      _model.rooms[_model.indexSelected].name??"",
                       style: TextStyle(color: Colors.white,fontFamily: 'Gotu'),
                     )
                   ],
@@ -171,6 +171,7 @@ class _ChatFlowState extends State<ChatFlow> {
                     hintText: "Aa",
                     hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColor.actionColor, width: 1),
                         borderRadius: BorderRadius.all(Radius.circular(90)))),
               ),
             ),
