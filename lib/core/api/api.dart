@@ -44,7 +44,7 @@ class Api {
     Map<String, dynamic> body = {
       "username": user.userName,
       "fullName": user.fullName,
-      "password":  user.password,
+      "password": user.password,
       "confirmPassword": user.password
     };
     var res = await http.post(url, body: body);
@@ -71,4 +71,34 @@ class Api {
       onError('Something get wrong! try again.');
     }
   }
+
+  Future<void> getUserOnline(
+   { Function(List<User>) onSuccess,
+    Function(String) onError,}
+  ) async {
+    //Todo: replace url
+    String url = '$endpoint/getAllUsers';
+    var res = await http.get(url);
+    if (res.statusCode == 200) {
+      try {
+        dynamic jsonRes = json.decode(res.body);
+        if (jsonRes['success']) {
+         //dynamic jsonData = jsonRes['data'];
+          //todo: add logic get list user
+          return;
+        } else {
+          onError(jsonRes['message']);
+        }
+      } catch (e) {
+        onError('Something get wrong! try again.');
+      }
+    } else if (res.statusCode == 400) {
+      dynamic jsonRes = json.decode(res.body);
+      onError(jsonRes['message']);
+    } else {
+      onError('Something get wrong! try again.');
+    }
+  }
+
+
 }

@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async{ 
       _model.setBusy(true);
+      // await _model.getUserOnline();
       Future.delayed(Duration(milliseconds: 500),(){
   _model.setBusy(false);
       });

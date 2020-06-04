@@ -9,4 +9,5 @@ class MessageModel{
   dynamic content;
   String idSender;
   MessageModel({this.type, this.content, this.idSender});
+  
 }
