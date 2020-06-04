@@ -87,41 +87,74 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
       alignment: Alignment.center,
       color: AppColor.background,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: size.width * 1/4),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(top: 24),
-              child: Text(
-                "Welcome to Homie",
-                style: TextStyle(
-                    fontSize: 42, color: Colors.white, fontFamily: 'Gotu'),
+        margin: EdgeInsets.symmetric(horizontal: size.width * 1 / 4),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 24),
+                child: Text(
+                  "Welcome to Homie",
+                  style: TextStyle(
+                      fontSize: 42, color: Colors.white, fontFamily: 'Gotu'),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: AppTextField(
-                controller: _userNameController,
-                hintText: 'User name or Email',
-                isObscure: false,
-                inputType: TextInputType.text,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: AppTextField(
+                  controller: _userNameController,
+                  hintText: 'User name or Email',
+                  isObscure: false,
+                  inputType: TextInputType.text,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: AppTextField(
-                controller: _pwdController,
-                hintText: 'Password',
-                isObscure: true,
-                inputType: TextInputType.text,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: AppTextField(
+                  controller: _pwdController,
+                  hintText: 'Password',
+                  isObscure: true,
+                  inputType: TextInputType.text,
+                ),
               ),
-            ),
-            Padding(
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: RaisedButton(
+                    color: Colors.white,
+                    onPressed: onLoginClick,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(90))),
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 18),
+                      width: double.infinity,
+                      child: Text(
+                        'Login',
+                        style: TextStyle(fontSize: 18, fontFamily: 'Gotu'),
+                      ),
+                    ),
+                  )),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Fogot password?",
+                  style: TextStyle(
+                      fontFamily: 'Gotu', fontSize: 16, color: Colors.white),
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: RaisedButton(
                   color: Colors.white,
-                  onPressed: onLoginClick,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterPage(),
+                        ));
+                  },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(90))),
                   child: Container(
@@ -129,55 +162,25 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
                     padding: EdgeInsets.symmetric(vertical: 18),
                     width: double.infinity,
                     child: Text(
-                      'Login',
-                      style: TextStyle(fontSize: 18, fontFamily: 'Gotu'),
-                    ),
-                  ),
-                )),
-            Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Fogot password?",
-                style: TextStyle(
-                    fontFamily: 'Gotu', fontSize: 16, color: Colors.white),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: RaisedButton(
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RegisterPage(),
-                      ));
-                },
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(90))),
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(vertical: 18),
-                  width: double.infinity,
-                  child: Text(
-                    'Register',
-                    style: TextStyle(
-                      fontFamily: 'Gotu',
-                      fontSize: 18,
+                      'Register',
+                      style: TextStyle(
+                        fontFamily: 'Gotu',
+                        fontSize: 18,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(
-                "Get more info about us!",
-                style: TextStyle(
-                    fontSize: 20, color: Colors.white, fontFamily: 'Gotu'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  "Get more info about us!",
+                  style: TextStyle(
+                      fontSize: 20, color: Colors.white, fontFamily: 'Gotu'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -185,46 +188,78 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
 
   @override
   Widget buildMobile(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Container(
       alignment: Alignment.center,
       color: AppColor.background,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(top: 24),
-              child: Text(
-                "Welcome to Homie",
-                style: TextStyle(
-                    fontSize: 32, color: Colors.white, fontFamily: 'Gotu'),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 24),
+                child: Text(
+                  "Welcome to Homie",
+                  style: TextStyle(
+                      fontSize: 32, color: Colors.white, fontFamily: 'Gotu'),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: AppTextField(
-                controller: _userNameController,
-                hintText: 'User name or Email',
-                isObscure: false,
-                inputType: TextInputType.text,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: AppTextField(
+                  controller: _userNameController,
+                  hintText: 'User name or Email',
+                  isObscure: false,
+                  inputType: TextInputType.text,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: AppTextField(
-                controller: _pwdController,
-                hintText: 'Password',
-                isObscure: true,
-                inputType: TextInputType.text,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: AppTextField(
+                  controller: _pwdController,
+                  hintText: 'Password',
+                  isObscure: true,
+                  inputType: TextInputType.text,
+                ),
               ),
-            ),
-            Padding(
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: RaisedButton(
+                    color: Colors.white,
+                    onPressed: onLoginClick,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(90))),
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 18),
+                      width: double.infinity,
+                      child: Text(
+                        'Login',
+                        style: TextStyle(fontSize: 18, fontFamily: 'Gotu'),
+                      ),
+                    ),
+                  )),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Fogot password?",
+                  style: TextStyle(
+                      fontFamily: 'Gotu', fontSize: 16, color: Colors.white),
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: RaisedButton(
                   color: Colors.white,
-                  onPressed: onLoginClick,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterPage(),
+                        ));
+                  },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(90))),
                   child: Container(
@@ -232,55 +267,25 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
                     padding: EdgeInsets.symmetric(vertical: 18),
                     width: double.infinity,
                     child: Text(
-                      'Login',
-                      style: TextStyle(fontSize: 18, fontFamily: 'Gotu'),
-                    ),
-                  ),
-                )),
-            Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Fogot password?",
-                style: TextStyle(
-                    fontFamily: 'Gotu', fontSize: 16, color: Colors.white),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: RaisedButton(
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RegisterPage(),
-                      ));
-                },
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(90))),
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(vertical: 18),
-                  width: double.infinity,
-                  child: Text(
-                    'Register',
-                    style: TextStyle(
-                      fontFamily: 'Gotu',
-                      fontSize: 18,
+                      'Register',
+                      style: TextStyle(
+                        fontFamily: 'Gotu',
+                        fontSize: 18,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(
-                "Get more info about us!",
-                style: TextStyle(
-                    fontSize: 18, color: Colors.white, fontFamily: 'Gotu'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  "Get more info about us!",
+                  style: TextStyle(
+                      fontSize: 18, color: Colors.white, fontFamily: 'Gotu'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
