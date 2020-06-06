@@ -8,6 +8,7 @@ import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
+import 'package:focus_app/ui/modules/home/widgets/search_user/select_item.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/user_item.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,20 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with ResponsivePage {
   HomeModel _model;
   TextEditingController searchController = TextEditingController();
-
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async{ 
-      _model.setBusy(true);
-      // await _model.getUserOnline();
-      Future.delayed(Duration(milliseconds: 500),(){
-  _model.setBusy(false);
-      });
-
-    });
-  }
+  TextEditingController roomNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +32,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
       builder: (context, model, child) {
         _model = model;
         return Scaffold(
-          body: model.busy? Loading(): buildUi(context),
+          body: model.busy ? Loading() : buildUi(context),
         );
       },
     );
@@ -88,7 +76,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
-                            _model.rooms[_model.indexSelected].name??"",
+                            _model.user.fullName ?? "",
                             style: TextStyle(
                                 color: Colors.white, fontFamily: 'Gotu'),
                             overflow: TextOverflow.ellipsis,
@@ -110,7 +98,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                           .map((e) => NavigationHorizontalRailDestination(
                                 padding: EdgeInsets.symmetric(vertical: 8),
                                 title: Container(
-                                  child: Text(e.name??"",
+                                  child: Text(e.name ?? "",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontFamily: 'Gotu')),
@@ -122,7 +110,9 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
-                                    child: Text(e.name??"   ".substring(0, 1).toUpperCase(),
+                                    child: Text(
+                                        e.name ??
+                                            "   ".substring(0, 1).toUpperCase(),
                                         style: TextStyle(
                                             color: Colors.grey,
                                             fontWeight: FontWeight.bold,
@@ -148,51 +138,105 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
             flex: 3,
             child: Container(
               decoration: BoxDecoration(
-                  color: AppColor.background,
+                  color: Colors.black38,
                   border:
                       Border(left: BorderSide(color: Colors.white, width: 1))),
               child: Column(
                 children: [
-                  Container(
-                    margin: EdgeInsets.only(bottom: 12),
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-                    color: Colors.black38,
-                    width: double.infinity,
-                    child: TextFormField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "Search User",
-                        hintStyle: TextStyle(
-                            color: AppColor.background,
-                            fontFamily: 'Gotu',
-                            fontSize: 14),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(90)),
-                          borderSide:
-                              BorderSide(color: AppColor.actionColor, width: 2),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Center(
+                        child: Text(
+                          "Create Room",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Gotu',
+                              fontSize: 16),
                         ),
                       ),
+                      Container(
+                          margin: EdgeInsets.all(8),
+                          child: ClipOval(
+                            child: Material(
+                              color: AppColor.actionColor, // button color
+                              child: InkWell(
+                                splashColor: Colors.red,
+                                onTap: () {
+                                  _model.createRoom(roomNameController.text);
+                                },
+                                child: SizedBox(
+                                  width: 42,
+                                  height: 42,
+                                  child: Icon(Icons.group_add),
+                                ),
+                              ),
+                            ),
+                          ))
+                    ],
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Room name",
                       style: TextStyle(
-                          color: AppColor.background, fontFamily: 'Gotu'),
-                      onChanged: (text) {
-                        _model.searchUser(text);
-                      },
+                          color: Colors.white,
+                          fontFamily: 'Gotu',
+                          fontSize: 12),
+                    ),
+                  ),
+                  buildInput(roomNameController,
+                      hintText: "Room name", onChange: (text) {}),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Members added",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Gotu',
+                          fontSize: 12),
                     ),
                   ),
                   Expanded(
                       child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        children: _model.memberInListAdd
+                            .map((e) => SelectedItem(
+                                  name: e.fullName,
+                                  onRemoveClick: () {
+                                    _model.removeMemberInList(e);
+                                  },
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  )),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Look for friends",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Gotu',
+                          fontSize: 12),
+                    ),
+                  ),
+                  buildInput(searchController, onChange: (text) {
+                    _model.searchUser(text);
+                  }, hintText: "Search user"),
+                  Expanded(
+                      child: Container(
+                    // color: Colors.black38,
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: ListView.builder(
                         itemCount: _model.userOnline.length,
                         itemBuilder: (context, index) {
                           return UserItem(
                             userName: _model.userOnline[index].fullName,
-                            onAddClick: () async{
-                              await _model.createRoomWithUser(_model.userOnline[index].id);
+                            onAddClick: () async {
+                              _model.addMemberInList(_model.userOnline[index]);
                             },
                           );
                         }),
@@ -203,6 +247,45 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _model.setBusy(true);
+      await _model.getUserOnline();
+      await _model.getRoomOfUserId();
+      Future.delayed(Duration(milliseconds: 1000), () {
+        _model.setBusy(false);
+      });
+    });
+  }
+
+  Widget buildInput(TextEditingController controller,
+      {Function(String) onChange, String hintText}) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      // color: Colors.black38,
+      width: double.infinity,
+      child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            filled: true,
+            fillColor: Colors.white,
+            hintText: hintText,
+            hintStyle: TextStyle(
+                color: AppColor.background, fontFamily: 'Gotu', fontSize: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(90)),
+              borderSide: BorderSide(color: AppColor.actionColor, width: 2),
+            ),
+          ),
+          style: TextStyle(color: AppColor.background, fontFamily: 'Gotu'),
+          onChanged: onChange),
     );
   }
 }

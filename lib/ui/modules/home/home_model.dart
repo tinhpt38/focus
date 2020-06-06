@@ -2,9 +2,8 @@ import 'package:focus_app/core/api/api.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/core/models/user.dart';
+import 'package:focus_app/core/services/chat_socket.dart';
 import 'package:focus_app/ui/base/base_page_model.dart';
-import 'package:flutter_socket_io/socket_io_manager.dart';
-import 'package:flutter_socket_io/flutter_socket_io.dart';
 
 class HomeModel extends PageModel {
   User _user;
@@ -18,11 +17,28 @@ class HomeModel extends PageModel {
   List<Room> get rooms => _rooms;
   List<MessageModel> messages = List();
   List<User> _userOnline = List();
-  List<User> get userOnline => _userOnline;
-  SocketIO _socketIO;
+  List<User> get userOnlineOrigin => _userOnline;
+  List<User> _userOnlineTemp = List();
+  List<User> get userOnline => _userOnlineTemp;
+  ChatSocket _chatSocket = ChatSocket();
+  List<User> _memberInListAdd = List();
+  List<User> get memberInListAdd => _memberInListAdd;
 
   HomeModel({User user}) {
     _user = user;
+    _chatSocket.connect();
+  }
+
+  addMemberInList(User value) {
+    _memberInListAdd.add(value);
+    _userOnlineTemp.remove(value);
+    notifyListeners();
+  }
+
+  removeMemberInList(User value) {
+    _memberInListAdd.remove(value);
+    _userOnlineTemp.add(value);
+    notifyListeners();
   }
 
   setRooms(List<Room> value) {
@@ -30,13 +46,14 @@ class HomeModel extends PageModel {
     notifyListeners();
   }
 
-    setUserOnline(List<User> value) {
+  setUserOnline(List<User> value) {
     _userOnline = value;
     notifyListeners();
   }
 
   getMessageForUser(int index) async {
     _indexSelected = index;
+    connectToRoom(_rooms[index]);
     notifyListeners();
   }
 
@@ -44,51 +61,55 @@ class HomeModel extends PageModel {
     List<User> values = List();
     _userOnline.forEach((e) {
       if (e.fullName.toLowerCase().contains(text.toLowerCase())) {
-        values.add(e);
+        if (e.id != user.id) {
+          values.add(e);
+        }
       }
     });
-    _userOnline = values;
+    _userOnlineTemp = values;
     notifyListeners();
   }
 
   addMessage({MessageType type, dynamic content}) {
     messages
         .add(MessageModel(type: type, content: content, idSender: _user.id));
-      _socketIO.sendMessage("addmessage", {});
+    // _socketIO.sendMessage("addmessage", {});
     notifyListeners();
   }
 
   createRoomWithUser(String id) async {}
 
-
   getUserOnline() async {
-    await Api().getUserOnline(
-      onSuccess: setUserOnline,
-      onError: (msg){
-
-      }
-    );
+    await Api().getUserOnline(onSuccess: setUserOnline, onError: (msg) {});
   }
 
   connectAllRooms() async {}
 
   connectToRoom(Room room) {
-    if(_socketIO != null){
-       _socketIO.disconnect();
-    }
-    _socketIO = SocketIOManager().createSocketIO("domain", "/chat",
-        query: "roomid=${room.id}", socketStatusCallback: _socketStatus);
-    _socketIO.init();
-    _socketIO.subscribe("socket_info", _onSocketInfo);
-    _socketIO.connect();
+    // _chatSocket.listenner(
+    //     room: room, subscribe: (message) {}, socketStatus: (status) {});
+  }
+
+  getRoomOfUserId() async {
+    await Api()
+        .getRoomOfUserID(id: user.id, onSuccess: (rooms) {}, onError: (msg) {});
+  }
+
+  createRoom(String name){
+    List<String> memberids = List();
+    _memberInListAdd.forEach((e) {
+      memberids.add(e.id);
+     });
+    _chatSocket.createRoom(
+      name: name,
+      memberIds: memberids,
+      ownerId: user.id,
+      onSuccess: (room){
+        print("create room success");
+      }
+    );
   }
 
 
-  _onSocketInfo(dynamic data) {
-    print("Socket info: " + data);
-  }
-
-  _socketStatus(dynamic data) {
-    print("Socket status: " + data);
-  }
+  
 }

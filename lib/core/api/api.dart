@@ -1,10 +1,15 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/core/models/user.dart';
+import 'package:focus_app/ui/base/share_key.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+String endpoint = "https://homie-chat.herokuapp.com";
 
 class Api {
-  String endpoint = "https://homie-chat.herokuapp.com";
 
   Future<void> login({
     String user,
@@ -72,19 +77,31 @@ class Api {
     }
   }
 
+  Future<Map<String, String>> headerAuthorization() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String token = sharedPreferences.getString(ShareKey.token);
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+  }
+
   Future<void> getUserOnline(
-   { Function(List<User>) onSuccess,
-    Function(String) onError,}
-  ) async {
-    //Todo: replace url
-    String url = '$endpoint/getAllUsers';
-    var res = await http.get(url);
+      {Function(List<User>) onSuccess, Function(String) onError}) async {
+    String url = '$endpoint/user?limit=10&offset=0';
+    var header = await headerAuthorization();
+    var res = await http.get(url, headers: header);
     if (res.statusCode == 200) {
       try {
         dynamic jsonRes = json.decode(res.body);
         if (jsonRes['success']) {
-         //dynamic jsonData = jsonRes['data'];
-          //todo: add logic get list user
+          List<dynamic> jsonData = jsonRes['data'];
+          List<User> users = List();
+          jsonData.forEach((e) {
+            users.add(User.formJson(e));
+          });
+          onSuccess(users);
           return;
         } else {
           onError(jsonRes['message']);
@@ -100,5 +117,36 @@ class Api {
     }
   }
 
-
+  Future<void> getRoomOfUserID({
+    @required String id,
+    Function(List<Room>) onSuccess,
+    Function(String) onError,
+  }) async {
+    String url = '$endpoint/rooms?userId=$id&limit=10&offset=0';
+    var header = await headerAuthorization();
+    var res = await http.get(url, headers: header);
+    if (res.statusCode == 200) {
+      try {
+        dynamic jsonRes = json.decode(res.body);
+        if (jsonRes['success']) {
+          List<dynamic> jsonData = jsonRes['data'];
+          List<Room> rooms = List();
+          jsonData.forEach((e) {
+            // rooms.add(Room.formJson(e));
+          });
+          onSuccess(rooms);
+          return;
+        } else {
+          onError(jsonRes['message']);
+        }
+      } catch (e) {
+        onError('Something get wrong! try again.');
+      }
+    } else if (res.statusCode == 400) {
+      dynamic jsonRes = json.decode(res.body);
+      onError(jsonRes['message']);
+    } else {
+      onError('Something get wrong! try again.');
+    }
+  }
 }
