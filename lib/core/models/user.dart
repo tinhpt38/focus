@@ -1,37 +1,45 @@
-import 'package:json_annotation/json_annotation.dart';
-part 'user.g.dart';
-
-@JsonSerializable()
-class User{
-  @JsonKey(name: 'username')
+class User {
   final String userName;
-  @JsonKey(name: 'fullName')
   final String fullName;
-  @JsonKey(name: 'email')
   final String email;
-  @JsonKey(name: 'password')
   final String password;
-  @JsonKey(name: 'address')
   final String address;
-  @JsonKey(name: 'phone')
   final String phone;
-  @JsonKey(name: 'website')
   final String website;
-  @JsonKey(name:'_id')
   final String id;
-  @JsonKey(name: 'rooms')
   final List<String> rooms;
 
+  User(
+      {this.userName,
+      this.fullName,
+      this.email,
+      this.password,
+      this.address,
+      this.phone,
+      this.website,
+      this.id,
+      this.rooms});
 
-  User({this.userName, this.fullName, this.email, this.password, this.address, this.phone, this.website, this.id, this.rooms});
+  User.formJson(Map<String, dynamic> json)
+      : this.userName = json['username'],
+        this.fullName = json['fullName'],
+        this.email = json['email'],
+        this.password = json['password'],
+        this.address = json['address'],
+        this.phone = json['phone'],
+        this.id = json['_id'],
+        this.website = json['website'],
+        this.rooms = json['rooms'];
 
-
-  factory User.formJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  
-  toJson() => _$UserToJson(this);
-
-
-
-
-
+  Map<String, dynamic> toJson() => {
+        'uername': this.userName,
+        'fullName': this.fullName,
+        'email': this.email,
+        'password': this.password,
+        'address': this.address,
+        'phone': this.phone,
+        'rooms': this.rooms,
+        'website':this.website,
+        '_id': this.id
+      };
 }

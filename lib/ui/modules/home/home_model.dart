@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:focus_app/core/api/api.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/core/models/user.dart';
-import 'package:focus_app/core/services/chat_socket.dart';
+import 'package:focus_app/core/services/chat_socket_io.dart';
 import 'package:focus_app/ui/base/base_page_model.dart';
 
 class HomeModel extends PageModel {
@@ -10,7 +11,12 @@ class HomeModel extends PageModel {
   User get user => _user;
 
   List<Room> _rooms = [
-    Room(),
+    Room(
+      id: "",
+      name: "Homie Server",
+      members: [],
+      owner: ""
+    )
   ];
   int _indexSelected = 0;
   int get indexSelected => _indexSelected;
@@ -20,13 +26,44 @@ class HomeModel extends PageModel {
   List<User> get userOnlineOrigin => _userOnline;
   List<User> _userOnlineTemp = List();
   List<User> get userOnline => _userOnlineTemp;
-  ChatSocket _chatSocket = ChatSocket();
   List<User> _memberInListAdd = List();
   List<User> get memberInListAdd => _memberInListAdd;
+  ChatSocketIO _chatSocketIO = ChatSocketIO();
+  bool _inviteNotification = false;
+  bool get inviteNotification => _inviteNotification;
+  Room _roomInvite;
+  Room get roomInvite => _roomInvite;
 
   HomeModel({User user}) {
     _user = user;
-    _chatSocket.connect();
+    // _chatSocket.connect(user);
+    _chatSocketIO.listener(user, invokeRoom: addRooms,
+    invokeInviteToRoom: inviteToRoom);
+  }
+
+  inviteToRoom(Room room){
+    _roomInvite = room;
+    _inviteNotification = true;
+    notifyListeners();
+  }
+
+  joinRoomBeInvite(){
+    _inviteNotification = false;
+    notifyListeners();
+  }
+
+  addRooms(Room value) {
+    _rooms.add(value);
+    notifyListeners();
+  }
+
+  removeRooms(Room value) {
+    _rooms.remove(value);
+    notifyListeners();
+  }
+
+  acceptInviteIntoRoom(String id){
+    _chatSocketIO.acceptInviteIntoRoom(id);
   }
 
   addMemberInList(User value) {
@@ -41,9 +78,9 @@ class HomeModel extends PageModel {
     notifyListeners();
   }
 
-  setRooms(List<Room> value) {
-    _rooms = value;
-    notifyListeners();
+  clearMemberAddToRoom(){
+    _userOnlineTemp.addAll(_memberInListAdd);
+    _memberInListAdd.clear();
   }
 
   setUserOnline(List<User> value) {
@@ -53,7 +90,6 @@ class HomeModel extends PageModel {
 
   getMessageForUser(int index) async {
     _indexSelected = index;
-    connectToRoom(_rooms[index]);
     notifyListeners();
   }
 
@@ -71,9 +107,9 @@ class HomeModel extends PageModel {
   }
 
   addMessage({MessageType type, dynamic content}) {
-    messages
-        .add(MessageModel(type: type, content: content, idSender: _user.id));
-    // _socketIO.sendMessage("addmessage", {});
+    // messages
+    //     .add(MessageModel(type: type, content: content, idSender: _user.id));
+    _chatSocketIO.chat(_rooms[_indexSelected].id, user.id,content, "text");
     notifyListeners();
   }
 
@@ -83,33 +119,19 @@ class HomeModel extends PageModel {
     await Api().getUserOnline(onSuccess: setUserOnline, onError: (msg) {});
   }
 
-  connectAllRooms() async {}
-
-  connectToRoom(Room room) {
-    // _chatSocket.listenner(
-    //     room: room, subscribe: (message) {}, socketStatus: (status) {});
-  }
-
   getRoomOfUserId() async {
     await Api()
         .getRoomOfUserID(id: user.id, onSuccess: (rooms) {}, onError: (msg) {});
   }
 
-  createRoom(String name){
+
+  createRoom(String name) {
     List<String> memberids = List();
     _memberInListAdd.forEach((e) {
       memberids.add(e.id);
-     });
-    _chatSocket.createRoom(
-      name: name,
-      memberIds: memberids,
-      ownerId: user.id,
-      onSuccess: (room){
-        print("create room success");
-      }
-    );
+    });
+    print('member id $memberids');
+    _chatSocketIO.createRoom(
+        name: name, memberIds: memberids, ownerId: user.id);
   }
-
-
-  
 }

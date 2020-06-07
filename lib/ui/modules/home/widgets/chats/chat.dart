@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
+import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
@@ -95,7 +96,7 @@ class _ChatFlowState extends State<ChatFlow> {
                       child: Icon(Icons.people),
                     ),
                     Text(
-                      _model.rooms[_model.indexSelected].name??"",
+                      _model.rooms[_model.indexSelected].name,
                       style: TextStyle(color: Colors.white,fontFamily: 'Gotu'),
                     )
                   ],

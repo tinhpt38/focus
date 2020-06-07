@@ -6,6 +6,7 @@ import 'package:focus_app/ui/base/loading.dart';
 import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
 import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
+import 'package:focus_app/ui/modules/home/dialog/invite_into_room_dialog.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/select_item.dart';
@@ -31,6 +32,25 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
       model: _model == null ? HomeModel(user: widget.user) : _model,
       builder: (context, model, child) {
         _model = model;
+        Future.delayed(Duration.zero,(){
+          if(_model.inviteNotification){
+            showDialog(
+              context: context,
+              builder: (BuildContext context){
+                return InviteIntoRoomDialog(
+                  room: _model.roomInvite,
+                  onAcceptClick:(id){
+                    _model.acceptInviteIntoRoom(id);
+                       Navigator.pop(context);
+                  },
+                  onCancelClick: (){
+                    Navigator.pop(context);
+                  },
+                );
+              }
+            );
+          }
+        });
         return Scaffold(
           body: model.busy ? Loading() : buildUi(context),
         );
@@ -88,39 +108,40 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                   ),
                   Expanded(
                     child: NavigationHorizontalRail(
-                      backgroundColor: AppColor.background,
-                      selectedColor: AppColor.actionColor,
-                      selectedIndex: _model.indexSelected,
-                      onChangeSelectedIndex: (index) {
-                        _model.getMessageForUser(index);
-                      },
-                      destinations: _model.rooms
-                          .map((e) => NavigationHorizontalRailDestination(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                title: Container(
-                                  child: Text(e.name ?? "",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'Gotu')),
-                                ),
-                                icon: Container(
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white,
-                                    ),
-                                    child: Text(
-                                        e.name ??
-                                            "   ".substring(0, 1).toUpperCase(),
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            fontFamily: 'Gotu'))),
-                              ))
-                          .toList(),
-                    ),
+                            backgroundColor: AppColor.background,
+                            selectedColor: AppColor.actionColor,
+                            selectedIndex: _model.indexSelected,
+                            onChangeSelectedIndex: (index) {
+                              _model.getMessageForUser(index);
+                            },
+                            destinations: _model.rooms
+                                .map((e) => NavigationHorizontalRailDestination(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8),
+                                      title: Container(
+                                        child: Text(e.name ?? "",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'Gotu')),
+                                      ),
+                                      icon: Container(
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                          ),
+                                          child: Text(
+                                              e.name.substring(0, 1)
+                                                      .toUpperCase(),
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  fontFamily: 'Gotu'))),
+                                    ))
+                                .toList(),
+                          ),
                   ),
                 ],
               )),
@@ -164,6 +185,9 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                 splashColor: Colors.red,
                                 onTap: () {
                                   _model.createRoom(roomNameController.text);
+                                  searchController.clear();
+                                  roomNameController.clear();
+                                  _model.clearMemberAddToRoom();
                                 },
                                 child: SizedBox(
                                   width: 42,
@@ -257,9 +281,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
       _model.setBusy(true);
       await _model.getUserOnline();
       await _model.getRoomOfUserId();
-      Future.delayed(Duration(milliseconds: 1000), () {
-        _model.setBusy(false);
-      });
+      _model.setBusy(false);
     });
   }
 
