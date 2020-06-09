@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 
 class Loading extends StatelessWidget {
+  final String title;
+  Loading({this.title = "Still setting the data..."});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,7 +26,7 @@ class Loading extends StatelessWidget {
               onTap: () {},
               splashColor: Colors.red,
               child: Text(
-                "Still setting the data...",
+                title,
                 style: TextStyle(
                     fontSize: 24, fontFamily: 'Gotu', color: Colors.white),
               ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/share_key.dart';
@@ -132,7 +133,7 @@ class Api {
           List<dynamic> jsonData = jsonRes['data'];
           List<Room> rooms = List();
           jsonData.forEach((e) {
-            // rooms.add(Room.formJson(e));
+            rooms.add(Room.formJson(e));
           });
           onSuccess(rooms);
           return;
@@ -149,4 +150,38 @@ class Api {
       onError('Something get wrong! try again.');
     }
   }
+  Future<void> getMessageForRoom({
+    @required String roomId,
+    Function(List<MessageModel>) onSuccess,
+    Function(String) onError,
+  }) async {
+    String url = '$endpoint/messages?roomId=$roomId&limit=10&offset=0';
+    var header = await headerAuthorization();
+    var res = await http.get(url, headers: header);
+    if (res.statusCode == 200) {
+      try {
+        dynamic jsonRes = json.decode(res.body);
+        if (jsonRes['success']) {
+          List<dynamic> jsonData = jsonRes['data'];
+          List<MessageModel> messages = List();
+          jsonData.forEach((e) {
+            messages.add(MessageModel.formJson(e));
+          });
+          onSuccess(messages);
+          return;
+        } else {
+          onError(jsonRes['message']);
+        }
+      } catch (e) {
+        onError('Something get wrong! try again.');
+      }
+    } else if (res.statusCode == 400) {
+      dynamic jsonRes = json.decode(res.body);
+      onError(jsonRes['message']);
+    } else {
+      onError('Something get wrong! try again.');
+    }
+  }
+
+
 }

@@ -7,6 +7,7 @@ import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/base/text_field.dart';
 import 'package:focus_app/ui/modules/auth/auth_model.dart';
 import 'package:focus_app/ui/modules/auth/register/register_page.dart';
+import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/home_page.dart';
 import 'package:provider/provider.dart';
 
@@ -22,8 +23,8 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
 
   @override
   void initState() {
-    _userNameController.text = "haihuynhngoc24";
-    _pwdController.text = "123244";
+    _userNameController.text = "tinhpt";
+    _pwdController.text = "canary";
     super.initState();
   }
 
@@ -59,7 +60,7 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(user: _model.user),
+            builder: (context) => HomePage(model: HomeModel(user: _model.user)),
           ));
     } else {
       showDialog(

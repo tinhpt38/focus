@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:focus_app/core/models/message.dart';
-import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:focus_app/ui/base/loading.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
 import 'package:provider/provider.dart';
@@ -41,9 +40,7 @@ class _ChatFlowState extends State<ChatFlow> {
     if (!chatController.hasClients) {
       return;
     }
-
     var scrollPosition = chatController.position;
-
     if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
       chatController.animateTo(
         scrollPosition.maxScrollExtent + 150,
@@ -61,11 +58,10 @@ class _ChatFlowState extends State<ChatFlow> {
 
   void addMessage(String text) {
     if (text.isNotEmpty) {
-      MessageType mst =
-          text.contains("http") ? MessageType.link : MessageType.text;
+      String mst = text.contains("http") ? "LINK" : "TEXT";
+      _model.addMessage(content: text, type: mst);
       setState(() {
-        _model.addMessage(content: text, type: mst);
-        textController.text = "";
+        textController.clear();
       });
       textNode.requestFocus();
       scrollToEnd();
@@ -95,21 +91,34 @@ class _ChatFlowState extends State<ChatFlow> {
                       ),
                       child: Icon(Icons.people),
                     ),
-                    Text(
-                      _model.rooms[_model.indexSelected].name,
-                      style: TextStyle(color: Colors.white,fontFamily: 'Gotu'),
-                    )
+                    _model.rooms.isEmpty
+                        ? Container()
+                        : Text(
+                            _model.rooms[_model.indexSelected].name,
+                            style: TextStyle(
+                                color: Colors.white, fontFamily: 'Gotu'),
+                          )
                   ],
                 ),
               ),
-              Expanded(
-                  child: ListView.builder(
-                controller: chatController,
-                itemCount: model.messages.length,
-                itemBuilder: (context, index) {
-                  return Message(message: model.messages[index],user: _model.user);
-                },
-              )),
+              model.messageForRoom == null
+                  ? Expanded(child: Container())
+                  : model.isLoadingMessage
+                      ? Expanded(
+                          child: Loading(
+                          title: "Loading Message",
+                        ))
+                      : Expanded(
+                          child: ListView.builder(
+                          controller: chatController,
+                          itemCount: model.messageForRoom.length,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            return Message(
+                                message: model.messageForRoom[index],
+                                user: _model.user);
+                          },
+                        )),
               Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   width: double.infinity,
@@ -146,7 +155,7 @@ class _ChatFlowState extends State<ChatFlow> {
           return extentionAction(Icons.image, () async {
             final _file = await pickImage();
             if (_file != null) {
-              _model.addMessage(type:MessageType.media, content:_file);
+              _model.addMessage(type: "MEDIA", content: _file);
             }
           });
         }
@@ -172,7 +181,8 @@ class _ChatFlowState extends State<ChatFlow> {
                     hintText: "Aa",
                     hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColor.actionColor, width: 1),
+                        borderSide:
+                            BorderSide(color: AppColor.actionColor, width: 1),
                         borderRadius: BorderRadius.all(Radius.circular(90)))),
               ),
             ),

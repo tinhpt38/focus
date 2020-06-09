@@ -1,41 +1,53 @@
-
+import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/room.dart';
 import 'package:focus_app/core/models/user.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatSocketIO {
-  static ChatSocketIO _instance = ChatSocketIO._internal();
+  static final ChatSocketIO _instance = ChatSocketIO._internal();
+  static final IO.Socket socket = IO.io('https://homie-chat.herokuapp.com');
   ChatSocketIO._internal();
-  factory ChatSocketIO() => _instance;
+  factory ChatSocketIO() {
+    socket.connect();
+    return _instance;
+  }
 
-  IO.Socket socket;
-
-  listener(User user, {Function(Room) invokeRoom,
-  Function(Room) invokeInviteToRoom}) {
-    socket = IO.io('https://homie-chat.herokuapp.com');
+  listener(User user,
+      {Function(Room) invokeRoom,
+      Function(Room) invokeInviteToRoom,
+      Function(MessageModel) receivedMessage}) {
     socket.on('connect', (_) {
-      print('connect');
+      print("connected");
       socket.emit("user join", user.toJson());
     });
-    socket.on("user online", (data) {
-      print("user online: $data");
-    });
+    socket.on("online list", (data) {});
     socket.on("created room", (data) {
       invokeRoom(Room(
-        id: data['_id'],
-        members: data['members'],
-        owner: data['owner'],
-        name: data['name']));
-    });
-    socket.on("invite to room", (data) {
-       invokeInviteToRoom(Room(
-        id: data['_id'],
-        members: data['members'],
-        owner: data['owner'],
-        name: data['name']));
+          id: data['_id'],
+          members: data['members'],
+          owner: data['owner'],
+          name: data['name']));
     });
 
-    return this;
+    socket.on("invite to room", (data) {
+      Room room = Room(
+          id: data['_id'],
+          members: data['members'],
+          owner: data['owner'],
+          name: data['name']);
+      if (room.members.contains(user.id)) {
+        invokeInviteToRoom(room);
+      }
+    });
+    socket.on("received message", (data) {
+      MessageModel msg = MessageModel(
+          type: data["type"],
+          idSender: data["sender"],
+          content: data["content"],
+          roomId: data["room"]);
+      print("id sender: msg:${msg.idSender}");
+      receivedMessage(msg);
+    });
   }
 
   createRoom({String ownerId, List<String> memberIds, String name}) {
@@ -44,18 +56,18 @@ class ChatSocketIO {
       'members': memberIds,
       'name': name,
     });
-    return this;
-  }
-  acceptInviteIntoRoom(String id){
-    socket.emit("join room",id);
+    // return this;
   }
 
-  chat(String roomid, String sender, dynamic content, String type){
-    socket.emit("chat message",{
-      'room':roomid,
-      'sender':sender,
-      'content':content,
-      'type':type
-    });
+  acceptInviteIntoRoom(String id) {
+    socket.emit("join room", id);
+    // return this;
+  }
+
+  chat(String roomid, String sender, dynamic content, String type) {
+    print("socket live: ${socket != null}");
+    socket.emit("chat message",
+        {'room': roomid, 'sender': sender, 'content': content, 'type': type});
+    // return this;
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:focus_app/core/api/api.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/room.dart';
@@ -11,44 +10,80 @@ class HomeModel extends PageModel {
   User get user => _user;
 
   List<Room> _rooms = [
-    Room(
-      id: "",
-      name: "Homie Server",
-      members: [],
-      owner: ""
-    )
+    Room(id: "", name: "Homie Server", members: [], owner: "")
   ];
   int _indexSelected = 0;
   int get indexSelected => _indexSelected;
   List<Room> get rooms => _rooms;
-  List<MessageModel> messages = List();
   List<User> _userOnline = List();
   List<User> get userOnlineOrigin => _userOnline;
   List<User> _userOnlineTemp = List();
   List<User> get userOnline => _userOnlineTemp;
   List<User> _memberInListAdd = List();
   List<User> get memberInListAdd => _memberInListAdd;
-  ChatSocketIO _chatSocketIO = ChatSocketIO();
-  bool _inviteNotification = false;
-  bool get inviteNotification => _inviteNotification;
-  Room _roomInvite;
-  Room get roomInvite => _roomInvite;
+  ChatSocketIO _chatSocketIO;
+  Map<String, List<MessageModel>> _messageAllRoom = {};
+  List<MessageModel> _messageForRoom = List();
+  List<MessageModel> get messageForRoom => _messageForRoom;
+  bool _isLoadingMessage = false;
+  bool get isLoadingMessage => _isLoadingMessage;
 
   HomeModel({User user}) {
     _user = user;
-    // _chatSocket.connect(user);
-    _chatSocketIO.listener(user, invokeRoom: addRooms,
-    invokeInviteToRoom: inviteToRoom);
+    _chatSocketIO = ChatSocketIO();
   }
 
-  inviteToRoom(Room room){
-    _roomInvite = room;
-    _inviteNotification = true;
+  //begin socket
+  listenner() {
+    _chatSocketIO.listener(_user,
+        invokeRoom: addRooms,
+        invokeInviteToRoom: inviteToRoom, receivedMessage: (msg) {
+      print("recived Message home model call back");
+      receivedMessage(msg);
+    });
+  }
+
+  inviteToRoom(Room room) {
+    if (_rooms.indexWhere((r) => r.id == room.id) == null) {
+      print("add to room");
+      _chatSocketIO.acceptInviteIntoRoom(room.id);
+      addRooms(room);
+    }
     notifyListeners();
   }
 
-  joinRoomBeInvite(){
-    _inviteNotification = false;
+  receivedMessage(MessageModel value) {
+    _messageAllRoom[value.roomId].add(value);
+    _messageForRoom = _messageAllRoom[value.roomId];
+    notifyListeners();
+  }
+
+  _generateRoomName() {
+    return _memberInListAdd.length == 1
+        ? _memberInListAdd.first.fullName
+        : _memberInListAdd.first.fullName + "+ And orthers!";
+  }
+
+  createRoom(String name) {
+    List<String> memberids = List();
+    _memberInListAdd.forEach((e) {
+      memberids.add(e.id);
+    });
+    String roomName = name.isEmpty ? _generateRoomName() : name;
+    _chatSocketIO.createRoom(
+        name: roomName, memberIds: memberids, ownerId: user.id);
+  }
+
+  addMessage({dynamic type, dynamic content}) {
+    _chatSocketIO.chat(_rooms[_indexSelected].id, user.id, content, type);
+    notifyListeners();
+  }
+  //end socket
+
+  // normal
+
+  setLoadingMessage(bool value) {
+    _isLoadingMessage = value;
     notifyListeners();
   }
 
@@ -60,10 +95,6 @@ class HomeModel extends PageModel {
   removeRooms(Room value) {
     _rooms.remove(value);
     notifyListeners();
-  }
-
-  acceptInviteIntoRoom(String id){
-    _chatSocketIO.acceptInviteIntoRoom(id);
   }
 
   addMemberInList(User value) {
@@ -78,7 +109,7 @@ class HomeModel extends PageModel {
     notifyListeners();
   }
 
-  clearMemberAddToRoom(){
+  clearMemberAddToRoom() {
     _userOnlineTemp.addAll(_memberInListAdd);
     _memberInListAdd.clear();
   }
@@ -88,8 +119,18 @@ class HomeModel extends PageModel {
     notifyListeners();
   }
 
-  getMessageForUser(int index) async {
+  changeIndexSelected(int index) async {
     _indexSelected = index;
+    String roomID = _rooms[index].id;
+    if (_messageAllRoom[roomID] == null) {
+      await getAllMessageForRoom();
+    }
+    _messageForRoom = _messageAllRoom[roomID];
+    notifyListeners();
+  }
+
+  setRoom(List<Room> values) {
+    _rooms = values;
     notifyListeners();
   }
 
@@ -106,32 +147,36 @@ class HomeModel extends PageModel {
     notifyListeners();
   }
 
-  addMessage({MessageType type, dynamic content}) {
-    // messages
-    //     .add(MessageModel(type: type, content: content, idSender: _user.id));
-    _chatSocketIO.chat(_rooms[_indexSelected].id, user.id,content, "text");
-    notifyListeners();
-  }
-
-  createRoomWithUser(String id) async {}
-
   getUserOnline() async {
     await Api().getUserOnline(onSuccess: setUserOnline, onError: (msg) {});
   }
 
   getRoomOfUserId() async {
-    await Api()
-        .getRoomOfUserID(id: user.id, onSuccess: (rooms) {}, onError: (msg) {});
+    await Api().getRoomOfUserID(
+        id: user.id,
+        onSuccess: (rooms) async {
+          setRoom(rooms);
+          await getAllMessageForRoom();
+          _messageForRoom = _messageAllRoom[rooms[_indexSelected].id];
+          notifyListeners();
+        },
+        onError: (msg) {});
   }
 
+  getAllMessageForRoom() async {
+    setLoadingMessage(true);
+    String roomID = _rooms[_indexSelected].id;
+    await Api().getMessageForRoom(
+        roomId: roomID,
+        onSuccess: (values) {
+          updateMessageAllRoom(values, roomID);
+        });
+    _messageForRoom = _messageAllRoom[roomID];
+    setLoadingMessage(false);
+  }
 
-  createRoom(String name) {
-    List<String> memberids = List();
-    _memberInListAdd.forEach((e) {
-      memberids.add(e.id);
-    });
-    print('member id $memberids');
-    _chatSocketIO.createRoom(
-        name: name, memberIds: memberids, ownerId: user.id);
+  updateMessageAllRoom(List<MessageModel> values, String roomID) {
+    _messageAllRoom[roomID] = values;
+    notifyListeners();
   }
 }

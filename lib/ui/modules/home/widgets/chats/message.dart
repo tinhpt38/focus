@@ -6,7 +6,6 @@ import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:focus_app/ui/base/common.dart';
-import 'package:provider/provider.dart';
 
 class Message extends StatefulWidget {
   final MessageModel message;
@@ -19,11 +18,16 @@ class Message extends StatefulWidget {
 }
 
 class _MessageState extends State<Message> {
+  bool isOwner;
+  @override
+  void initState() {
+    isOwner = widget.message.idSender == widget.user.id;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    bool isOwner = widget.message.idSender == widget.user.id;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 24),
       child: Row(
@@ -65,8 +69,9 @@ class _MessageState extends State<Message> {
   Widget buildMessage(Size size, MessageModel message, bool isOwner) {
     Alignment alignment =
         isOwner ? Alignment.centerRight : Alignment.centerLeft;
+    double measure = size.width * 1/8;
     EdgeInsets margin =
-        isOwner ? EdgeInsets.only(left: 42) : EdgeInsets.only(right: 42);
+        isOwner ? EdgeInsets.only(left: measure) : EdgeInsets.only(right: measure);
     return Expanded(
       child: Container(
           margin: margin,
@@ -81,11 +86,11 @@ class _MessageState extends State<Message> {
 
   Widget buildMessageype(Size size, MessageModel message) {
     switch (message.type) {
-      case MessageType.text:
+      case "TEXT":
         {
           return SelectableText(message.content, textAlign: TextAlign.start);
         }
-      case MessageType.media:
+      case "MEDIA":
         {
           try {
             return FutureBuilder<List<int>>(
@@ -102,12 +107,11 @@ class _MessageState extends State<Message> {
             child: Icon(Icons.error),
           );
         }
-      case MessageType.link:
+      case "LINK":
         {
-
           bool isImage = false;
-          imageExtentions.forEach((extention) { 
-            if(message.content.toString().toLowerCase().contains(extention)){
+          imageExtentions.forEach((extention) {
+            if (message.content.toString().toLowerCase().contains(extention)) {
               isImage = true;
             }
           });
