@@ -14,7 +14,7 @@ class UserItem extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(8))),
+              borderRadius: BorderRadius.all(Radius.circular(180))),
           margin: EdgeInsets.symmetric(vertical: 5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -22,7 +22,7 @@ class UserItem extends StatelessWidget {
             children: [
               Container(
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,
@@ -46,10 +46,10 @@ class UserItem extends StatelessWidget {
                       color: AppColor.actionColor, // button color
                       child: InkWell(
                         splashColor: Colors.red,
-                        onTap: () {},
+                        onTap: onAddClick,
                         child: SizedBox(
-                          width: 56,
-                          height: 56,
+                          width: 42,
+                          height: 42,
                           child: Icon(Icons.add),
                         ),
                       ),

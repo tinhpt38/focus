@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/ui/base/app_color.dart';
+import 'package:focus_app/ui/base/loading.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
 import 'package:provider/provider.dart';
@@ -34,38 +34,43 @@ class _ChatFlowState extends State<ChatFlow> {
     textNode = FocusNode();
     chatController = ScrollController();
     super.initState();
+    chatController.addListener(listennerScroll);
+  }
+
+  listennerScroll() {
+    print("Scrool pos ${chatController.offset}");
+    if (chatController.offset == 0.0) {
+      _model.loadmoreMessageForRoom();
+    }
   }
 
   void scrollToEnd() {
-    if (!chatController.hasClients) {
-      return;
-    }
-
-    var scrollPosition = chatController.position;
-
-    if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
-      chatController.animateTo(
-        scrollPosition.maxScrollExtent + 150,
-        duration: new Duration(milliseconds: 100),
-        curve: Curves.easeOut,
-      );
+    if (chatController != null) {
+      var scrollPosition = chatController.position;
+      if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
+        chatController.animateTo(
+          scrollPosition.maxScrollExtent + 150,
+          duration: new Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     }
   }
 
   @override
   void dispose() {
     textNode.dispose();
+    chatController.removeListener(listennerScroll);
+    chatController.dispose();
     super.dispose();
   }
 
   void addMessage(String text) {
     if (text.isNotEmpty) {
-      MessageType mst =
-          text.contains("http") ? MessageType.link : MessageType.text;
+      String mst = text.contains("http") ? "LINK" : "TEXT";
+      _model.addMessage(content: text, type: mst);
       setState(() {
-        _model.messages.add(MessageModel(
-            messageForm: MessageForm.owner, content: text, type: mst));
-        textController.text = "";
+        textController.clear();
       });
       textNode.requestFocus();
       scrollToEnd();
@@ -95,21 +100,41 @@ class _ChatFlowState extends State<ChatFlow> {
                       ),
                       child: Icon(Icons.people),
                     ),
-                    Text(
-                      "NO 1",
-                      style: TextStyle(color: Colors.white,fontFamily: 'Gotu'),
-                    )
+                    _model.rooms.isEmpty
+                        ? Container()
+                        : Text(
+                            _model.rooms[_model.indexSelected].name,
+                            style: TextStyle(
+                                color: Colors.white, fontFamily: 'Gotu'),
+                          )
                   ],
                 ),
               ),
               Expanded(
-                  child: ListView.builder(
-                controller: chatController,
-                itemCount: model.messages.length,
-                itemBuilder: (context, index) {
-                  return Message(model.messages[index]);
-                },
-              )),
+                  child: model.messageForRoom == null ||
+                          model.messageForRoom.isEmpty
+                      ? Container()
+                      : model.isLoadingMessage
+                          ? Loading(
+                              title: "Loading Message",
+                            )
+                          : ListView.builder(
+                              controller: chatController,
+                              itemCount: model.messageForRoom.length,
+                              itemBuilder: (context, index) {
+                                if (index == model.messageForRoom.length) {
+                                  scrollToEnd();
+                                  // return Loadmore(
+                                  //   onLoadmoreClick: (){
+
+                                  //   },
+                                  // );
+                                }
+                                return Message(
+                                    message: model.messageForRoom[index],
+                                    user: _model.user);
+                              },
+                            )),
               Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   width: double.infinity,
@@ -146,7 +171,8 @@ class _ChatFlowState extends State<ChatFlow> {
           return extentionAction(Icons.image, () async {
             final _file = await pickImage();
             if (_file != null) {
-              _model.addMessage(MessageType.media, _file);
+              List<int> imageByte = await _file.readAsBytes();
+              _model.addMessage(type: "MEDIA", content: imageByte);
             }
           });
         }
@@ -172,6 +198,8 @@ class _ChatFlowState extends State<ChatFlow> {
                     hintText: "Aa",
                     hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: AppColor.actionColor, width: 1),
                         borderRadius: BorderRadius.all(Radius.circular(90)))),
               ),
             ),

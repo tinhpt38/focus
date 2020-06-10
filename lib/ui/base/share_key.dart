@@ -2,5 +2,6 @@
 
 class ShareKey{
 
-  static final String token = 'token';
+  static const String token = 'token';
+  static const String uid = 'user_id';
 }

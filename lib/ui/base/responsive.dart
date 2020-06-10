@@ -4,7 +4,6 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 
 abstract class ResponsivePage{
-
   Widget buildDesktop(BuildContext context);
   Widget buildTablet(BuildContext context);
   Widget buildMobile(BuildContext context);

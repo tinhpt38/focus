@@ -34,21 +34,26 @@ class AuthModel extends PageModel {
   login(String username, String password) async {
     setBusy(true);
     await _api.login(user: username, password: password,
-    onError: setError,
-    onSuccess: (user,token){
+    onError: (err){
+      setError(err);
+    },
+    onSuccess: (user,token)async{
       _token = token;
       setUser(user);
       setLoginSuccess(true);
-    });
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+      SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setString(ShareKey.token, _token);
+    preferences.setString(ShareKey.uid, user.id);
+    });
     setBusy(false);
   }
 
   register(User user) async {
     setBusy(true);
     await _api.register(user: user,
-    onError: setError,
+    onError: (msg){
+      setError(msg);
+    },
     onSuccess: (user,token){
       _token = token;
       setUser(user);

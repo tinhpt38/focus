@@ -1,17 +1,15 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
+import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:focus_app/ui/base/common.dart';
 
-enum MessageForm { owner, homie }
-
 class Message extends StatefulWidget {
   final MessageModel message;
+  final User user;
 
-  Message(this.message);
+  Message({this.user, this.message});
 
   @override
   _MessageState createState() => _MessageState();
@@ -19,10 +17,9 @@ class Message extends StatefulWidget {
 
 class _MessageState extends State<Message> {
   bool isOwner;
-
   @override
   void initState() {
-    isOwner = widget.message.messageForm == MessageForm.owner;
+    isOwner = widget.message.idSender == widget.user.id;
     super.initState();
   }
 
@@ -48,7 +45,7 @@ class _MessageState extends State<Message> {
               ),
             ),
           ),
-          buildMessage(size, widget.message),
+          buildMessage(size, widget.message, isOwner),
           Visibility(
             visible: isOwner,
             child: Container(
@@ -67,11 +64,12 @@ class _MessageState extends State<Message> {
     );
   }
 
-  Widget buildMessage(Size size, MessageModel message) {
+  Widget buildMessage(Size size, MessageModel message, bool isOwner) {
     Alignment alignment =
         isOwner ? Alignment.centerRight : Alignment.centerLeft;
+    double measure = size.width * 1/8;
     EdgeInsets margin =
-        isOwner ? EdgeInsets.only(left: 42) : EdgeInsets.only(right: 42);
+        isOwner ? EdgeInsets.only(left: measure) : EdgeInsets.only(right: measure);
     return Expanded(
       child: Container(
           margin: margin,
@@ -86,33 +84,36 @@ class _MessageState extends State<Message> {
 
   Widget buildMessageype(Size size, MessageModel message) {
     switch (message.type) {
-      case MessageType.text:
+      case "TEXT":
         {
           return SelectableText(message.content, textAlign: TextAlign.start);
         }
-      case MessageType.media:
+      case "MEDIA":
         {
           try {
-            return FutureBuilder<List<int>>(
-                future: message.content.readAsBytes(),
-                builder: (context, snapshot) {
-                  final _bytes = Uint8List.fromList(snapshot.data);
-                  return Image.memory(
-                    _bytes,
+            // return FutureBuilder<List<int>>(
+            //     future: message.content.readAsBytes(),
+            //     builder: (context, snapshot) {
+            //       final _bytes = Uint8List.fromList(snapshot.data);
+            //       return Image.memory(
+            //         _bytes,
+            //         fit: BoxFit.contain,
+            //       );
+            //     });
+            return Image.memory(
+                    message.content as List<int>,
                     fit: BoxFit.contain,
                   );
-                });
           } catch (_) {}
           return Container(
             child: Icon(Icons.error),
           );
         }
-      case MessageType.link:
+      case "LINK":
         {
-
           bool isImage = false;
-          imageExtentions.forEach((extention) { 
-            if(message.content.toString().toLowerCase().contains(extention)){
+          imageExtentions.forEach((extention) {
+            if (message.content.toString().toLowerCase().contains(extention)) {
               isImage = true;
             }
           });

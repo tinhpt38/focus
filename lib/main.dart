@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:focus_app/ui/base/restart_widget.dart';
 import 'package:focus_app/ui/modules/auth/login/login_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(RestarApp(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home:LoginPage(),
+      home: LoginPage(),
     );
   }
 }
