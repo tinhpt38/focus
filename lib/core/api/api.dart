@@ -28,7 +28,7 @@ class Api {
           User user = User.formJson(jsonData['user']);
           String token = jsonData['token'];
           onSuccess(user, token);
-          print("token $token");
+          print("user id ${user.id}");
           return;
         } else {
           onError(jsonRes['message']);
@@ -46,19 +46,12 @@ class Api {
     Function(String) onError,
   }) async {
     var url = "$endpoint/auth/logout";
-    var res = await http.get(url);
+    var header = await headerAuthorization();
+    var res = await http.post(url,headers: header);
     if (res.statusCode == 200) {
       try {
         dynamic jsonRes = json.decode(res.body);
-        if (jsonRes['success']) {
-          dynamic jsonData = jsonRes['data'];
-          String token = jsonData['token'];
-          onSuccess();
-          print("token $token");
-          return;
-        } else {
-          onError('Something get wrong! try again.');
-        }
+        jsonRes['success'] ? onSuccess(): onError('Something get wrong! try again.');
       } catch (e) {
         onError('Something get wrong! try again.');
       }
@@ -79,7 +72,8 @@ class Api {
       "confirmPassword": user.password
     };
     var res = await http.post(url, body: body);
-    if (res.statusCode == 200) {
+    print('res -> body ${res.body}');
+    if (res.statusCode == 201) {
       try {
         dynamic jsonRes = json.decode(res.body);
         if (jsonRes['success']) {

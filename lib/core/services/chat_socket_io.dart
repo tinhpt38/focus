@@ -15,12 +15,21 @@ class ChatSocketIO {
   listener(User user,
       {Function(Room) invokeRoom,
       Function(Room) invokeInviteToRoom,
-      Function(MessageModel) receivedMessage}) {
+      Function(MessageModel) receivedMessage,
+      Function(List<User>) usersOnline
+      }) {
     socket.on('connect', (_) {
       print("connected");
       socket.emit("user join", user.toJson());
     });
-    socket.on("online list", (data) {});
+    socket.on("online list", (data) {
+      List<dynamic> dataRe = data as List<dynamic>;
+      List<User> userOnline = List();
+      dataRe.forEach((js) {
+        userOnline.add(User.formJson(js));
+      });
+      usersOnline(userOnline);
+    });
     socket.on("created room", (data) {
       invokeRoom(Room(
           id: data['_id'],

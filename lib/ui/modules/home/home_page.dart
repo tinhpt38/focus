@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
       _model.setBusy(true);
       await _model.getUserOnline();
       await _model.getRoomOfUserId();
+      _model.autoJoinRoom();
       _model.setBusy(false);
     });
   }
@@ -279,7 +280,9 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                   Container(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Look for friends",
+                      "Look for friends (${_model.totalOnline}/${_model.userOnlineOrigin.length - 1})",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'Gotu',

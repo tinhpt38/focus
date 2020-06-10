@@ -32,7 +32,7 @@ class User {
         this.rooms = json['rooms'];
 
   Map<String, dynamic> toJson() => {
-        'uername': this.userName,
+        'username': this.userName,
         'fullName': this.fullName,
         'email': this.email,
         'password': this.password,
