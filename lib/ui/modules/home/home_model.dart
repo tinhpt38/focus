@@ -9,9 +9,7 @@ class HomeModel extends PageModel {
   User _user;
   User get user => _user;
 
-  List<Room> _rooms = [
-    Room(id: "", name: "Homie Server", members: [], owner: "")
-  ];
+  List<Room> _rooms = List();
   int _indexSelected = 0;
   int get indexSelected => _indexSelected;
   List<Room> get rooms => _rooms;
@@ -27,6 +25,11 @@ class HomeModel extends PageModel {
   List<MessageModel> get messageForRoom => _messageForRoom;
   bool _isLoadingMessage = false;
   bool get isLoadingMessage => _isLoadingMessage;
+  bool _isLogouting = false;
+  bool get isLogginOut => _isLogouting;
+  bool _isLogout = false;
+  bool get isLogout => _isLogout;
+  int _limit = 10;
 
   HomeModel({User user}) {
     _user = user;
@@ -44,9 +47,14 @@ class HomeModel extends PageModel {
   }
 
   inviteToRoom(Room room) {
-    if (_rooms.indexWhere((r) => r.id == room.id) == null) {
+    bool isHaveRoom = false;
+    _rooms.forEach((r) {
+      if (r.id as String == room.id as String) {
+        isHaveRoom = true;
+      }
+    });
+    if (!isHaveRoom) {
       print("add to room");
-      _chatSocketIO.acceptInviteIntoRoom(room.id);
       addRooms(room);
     }
     notifyListeners();
@@ -54,7 +62,10 @@ class HomeModel extends PageModel {
 
   receivedMessage(MessageModel value) {
     _messageAllRoom[value.roomId].add(value);
-    _messageForRoom = _messageAllRoom[value.roomId];
+    Room currentRoom = _rooms[_indexSelected];
+    if (currentRoom.id == value.roomId) {
+      _messageForRoom = _messageAllRoom[value.roomId];
+    }
     notifyListeners();
   }
 
@@ -69,12 +80,18 @@ class HomeModel extends PageModel {
     _memberInListAdd.forEach((e) {
       memberids.add(e.id);
     });
+    memberids.add(user.id);
     String roomName = name.isEmpty ? _generateRoomName() : name;
     _chatSocketIO.createRoom(
         name: roomName, memberIds: memberids, ownerId: user.id);
   }
 
   addMessage({dynamic type, dynamic content}) {
+    Room room = _rooms[_indexSelected];
+    MessageModel messageModel = MessageModel(
+        roomId: room.id, idSender: user.id, content: content, type: type);
+    _messageAllRoom[room.id].add(messageModel);
+    // _messageForRoom.add(messageModel);
     _chatSocketIO.chat(_rooms[_indexSelected].id, user.id, content, type);
     notifyListeners();
   }
@@ -82,8 +99,18 @@ class HomeModel extends PageModel {
 
   // normal
 
+  setLogout(bool value) {
+    _isLogout = value;
+    notifyListeners();
+  }
+
   setLoadingMessage(bool value) {
     _isLoadingMessage = value;
+    notifyListeners();
+  }
+
+  setLogingOut(bool value) {
+    _isLogouting = value;
     notifyListeners();
   }
 
@@ -147,14 +174,16 @@ class HomeModel extends PageModel {
     notifyListeners();
   }
 
-  getUserOnline() async {
+  getUserOnline({int limit = 10}) async {
     await Api().getUserOnline(onSuccess: setUserOnline, onError: (msg) {});
   }
 
-  getRoomOfUserId() async {
+  getRoomOfUserId({int limit = 10}) async {
     await Api().getRoomOfUserID(
+        limit: limit,
         id: user.id,
         onSuccess: (rooms) async {
+          setBusy(false);
           setRoom(rooms);
           await getAllMessageForRoom();
           _messageForRoom = _messageAllRoom[rooms[_indexSelected].id];
@@ -163,20 +192,47 @@ class HomeModel extends PageModel {
         onError: (msg) {});
   }
 
-  getAllMessageForRoom() async {
+  getAllMessageForRoom({int limit = 10}) async {
     setLoadingMessage(true);
     String roomID = _rooms[_indexSelected].id;
     await Api().getMessageForRoom(
+        limit: limit,
         roomId: roomID,
         onSuccess: (values) {
           updateMessageAllRoom(values, roomID);
+          setLoadingMessage(false);
         });
     _messageForRoom = _messageAllRoom[roomID];
+    notifyListeners();
     setLoadingMessage(false);
+  }
+
+  loadmoreMessageForRoom() async {
+    await getAllMessageForRoom(limit: _limit + _messageForRoom.length);
+  }
+
+  loadmoreRooms() async {
+    await getRoomOfUserId(limit: _limit + _rooms.length);
+  }
+
+  loadmoreUserOnline() async {
+    await getUserOnline(limit: _limit + _userOnline.length);
   }
 
   updateMessageAllRoom(List<MessageModel> values, String roomID) {
     _messageAllRoom[roomID] = values;
     notifyListeners();
+  }
+
+  logout() async {
+    setLogingOut(true);
+    await Api().logout(onSuccess: () {
+      setLogout(true);
+      return;
+    }, onError: (msg) {
+      setLogout(false);
+      return;
+    });
+    setLogingOut(false);
   }
 }

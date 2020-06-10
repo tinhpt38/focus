@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/user.dart';
@@ -93,15 +91,19 @@ class _MessageState extends State<Message> {
       case "MEDIA":
         {
           try {
-            return FutureBuilder<List<int>>(
-                future: message.content.readAsBytes(),
-                builder: (context, snapshot) {
-                  final _bytes = Uint8List.fromList(snapshot.data);
-                  return Image.memory(
-                    _bytes,
+            // return FutureBuilder<List<int>>(
+            //     future: message.content.readAsBytes(),
+            //     builder: (context, snapshot) {
+            //       final _bytes = Uint8List.fromList(snapshot.data);
+            //       return Image.memory(
+            //         _bytes,
+            //         fit: BoxFit.contain,
+            //       );
+            //     });
+            return Image.memory(
+                    message.content as List<int>,
                     fit: BoxFit.contain,
                   );
-                });
           } catch (_) {}
           return Container(
             child: Icon(Icons.error),

@@ -1,11 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/base_page.dart';
 import 'package:focus_app/ui/base/loading.dart';
 import 'package:focus_app/ui/base/navigation_horizontal_rail_destination.dart';
 import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
+import 'package:focus_app/ui/base/restart_widget.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/select_item.dart';
@@ -24,12 +26,16 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
   HomeModel _model;
   TextEditingController searchController = TextEditingController();
   TextEditingController roomNameController = TextEditingController();
+  ScrollController _searchUserController = ScrollController();
+  ScrollController _roomsController = ScrollController();
 
   @override
   void initState() {
     _model = widget.model;
     super.initState();
     _model.listenner();
+    _searchUserController.addListener(_searchScrollListenner);
+    _roomsController.addListener(_roomsScrollListenner);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _model.setBusy(true);
       await _model.getUserOnline();
@@ -38,14 +44,38 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
     });
   }
 
+  _searchScrollListenner() async {
+    if (_searchUserController.offset == 0.0) {
+      await _model.loadmoreUserOnline();
+    }
+  }
+
+  _roomsScrollListenner() async {
+    if (_roomsController.offset == 0.0) {
+      await _model.loadmoreRooms();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BasePage<HomeModel>(
       model: widget.model,
       builder: (context, model, child) {
         _model = model;
+        Future.delayed(Duration.zero, () {
+          if (model.isLogout) {
+            RestarApp.restartApp(context);
+          }
+        });
         return Scaffold(
-          body: model.busy ? Loading() : buildUi(context),
+          body: model.busy
+              ? Loading()
+              : model.isLogginOut
+                  ? Loading(
+                      title:
+                          "Application is logging out for ${_model.user.userName}",
+                    )
+                  : buildUi(context),
         );
       },
     );
@@ -94,7 +124,6 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                                 color: Colors.white, fontFamily: 'Gotu'),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-
                           ),
                         ),
                       ],
@@ -134,6 +163,24 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                               ))
                           .toList(),
                     ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    color: Colors.black38,
+                    child: InkWell(
+                        onTap: () async {
+                          await _model.logout();
+                        },
+                        splashColor: AppColor.actionColor,
+                        child: Transform.rotate(
+                          angle: pi,
+                          child: Icon(
+                            Icons.exit_to_app,
+                            size: 46,
+                            color: Colors.red,
+                          ),
+                        )),
                   ),
                 ],
               )),

@@ -34,25 +34,34 @@ class _ChatFlowState extends State<ChatFlow> {
     textNode = FocusNode();
     chatController = ScrollController();
     super.initState();
+    chatController.addListener(listennerScroll);
+  }
+
+  listennerScroll() {
+    print("Scrool pos ${chatController.offset}");
+    if (chatController.offset == 0.0) {
+      _model.loadmoreMessageForRoom();
+    }
   }
 
   void scrollToEnd() {
-    if (!chatController.hasClients) {
-      return;
-    }
-    var scrollPosition = chatController.position;
-    if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
-      chatController.animateTo(
-        scrollPosition.maxScrollExtent + 150,
-        duration: new Duration(milliseconds: 100),
-        curve: Curves.easeOut,
-      );
+    if (chatController != null) {
+      var scrollPosition = chatController.position;
+      if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
+        chatController.animateTo(
+          scrollPosition.maxScrollExtent + 150,
+          duration: new Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     }
   }
 
   @override
   void dispose() {
     textNode.dispose();
+    chatController.removeListener(listennerScroll);
+    chatController.dispose();
     super.dispose();
   }
 
@@ -101,24 +110,31 @@ class _ChatFlowState extends State<ChatFlow> {
                   ],
                 ),
               ),
-              model.messageForRoom == null
-                  ? Expanded(child: Container())
-                  : model.isLoadingMessage
-                      ? Expanded(
-                          child: Loading(
-                          title: "Loading Message",
-                        ))
-                      : Expanded(
-                          child: ListView.builder(
-                          controller: chatController,
-                          itemCount: model.messageForRoom.length,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            return Message(
-                                message: model.messageForRoom[index],
-                                user: _model.user);
-                          },
-                        )),
+              Expanded(
+                  child: model.messageForRoom == null ||
+                          model.messageForRoom.isEmpty
+                      ? Container()
+                      : model.isLoadingMessage
+                          ? Loading(
+                              title: "Loading Message",
+                            )
+                          : ListView.builder(
+                              controller: chatController,
+                              itemCount: model.messageForRoom.length,
+                              itemBuilder: (context, index) {
+                                if (index == model.messageForRoom.length) {
+                                  scrollToEnd();
+                                  // return Loadmore(
+                                  //   onLoadmoreClick: (){
+
+                                  //   },
+                                  // );
+                                }
+                                return Message(
+                                    message: model.messageForRoom[index],
+                                    user: _model.user);
+                              },
+                            )),
               Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   width: double.infinity,
@@ -155,7 +171,8 @@ class _ChatFlowState extends State<ChatFlow> {
           return extentionAction(Icons.image, () async {
             final _file = await pickImage();
             if (_file != null) {
-              _model.addMessage(type: "MEDIA", content: _file);
+              List<int> imageByte = await _file.readAsBytes();
+              _model.addMessage(type: "MEDIA", content: imageByte);
             }
           });
         }

@@ -51,7 +51,9 @@ class AuthModel extends PageModel {
   register(User user) async {
     setBusy(true);
     await _api.register(user: user,
-    onError: setError,
+    onError: (msg){
+      setError(msg);
+    },
     onSuccess: (user,token){
       _token = token;
       setUser(user);

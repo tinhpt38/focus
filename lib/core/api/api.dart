@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 String endpoint = "https://homie-chat.herokuapp.com";
 
 class Api {
-
   Future<void> login({
     String user,
     String password,
@@ -33,6 +32,32 @@ class Api {
           return;
         } else {
           onError(jsonRes['message']);
+        }
+      } catch (e) {
+        onError('Something get wrong! try again.');
+      }
+    } else {
+      onError('Something get wrong! try again.');
+    }
+  }
+
+  Future<void> logout({
+    Function() onSuccess,
+    Function(String) onError,
+  }) async {
+    var url = "$endpoint/auth/logout";
+    var res = await http.get(url);
+    if (res.statusCode == 200) {
+      try {
+        dynamic jsonRes = json.decode(res.body);
+        if (jsonRes['success']) {
+          dynamic jsonData = jsonRes['data'];
+          String token = jsonData['token'];
+          onSuccess();
+          print("token $token");
+          return;
+        } else {
+          onError('Something get wrong! try again.');
         }
       } catch (e) {
         onError('Something get wrong! try again.');
@@ -89,8 +114,10 @@ class Api {
   }
 
   Future<void> getUserOnline(
-      {Function(List<User>) onSuccess, Function(String) onError}) async {
-    String url = '$endpoint/user?limit=10&offset=0';
+      {int limit,
+      Function(List<User>) onSuccess,
+      Function(String) onError}) async {
+    String url = '$endpoint/user?limit=$limit&offset=0';
     var header = await headerAuthorization();
     var res = await http.get(url, headers: header);
     if (res.statusCode == 200) {
@@ -120,10 +147,11 @@ class Api {
 
   Future<void> getRoomOfUserID({
     @required String id,
+    int limit,
     Function(List<Room>) onSuccess,
     Function(String) onError,
   }) async {
-    String url = '$endpoint/rooms?userId=$id&limit=10&offset=0';
+    String url = '$endpoint/rooms?userId=$id&limit=$limit&offset=0';
     var header = await headerAuthorization();
     var res = await http.get(url, headers: header);
     if (res.statusCode == 200) {
@@ -150,12 +178,14 @@ class Api {
       onError('Something get wrong! try again.');
     }
   }
+
   Future<void> getMessageForRoom({
     @required String roomId,
+    int limit = 10,
     Function(List<MessageModel>) onSuccess,
     Function(String) onError,
   }) async {
-    String url = '$endpoint/messages?roomId=$roomId&limit=10&offset=0';
+    String url = '$endpoint/messages?roomId=$roomId&limit=$limit&offset=0';
     var header = await headerAuthorization();
     var res = await http.get(url, headers: header);
     if (res.statusCode == 200) {
@@ -182,6 +212,4 @@ class Api {
       onError('Something get wrong! try again.');
     }
   }
-
-
 }

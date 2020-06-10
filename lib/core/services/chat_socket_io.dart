@@ -35,17 +35,20 @@ class ChatSocketIO {
           members: data['members'],
           owner: data['owner'],
           name: data['name']);
+      print("ON invite to room ${room.name}");
       if (room.members.contains(user.id)) {
+        acceptInviteIntoRoom(room.id);
         invokeInviteToRoom(room);
       }
     });
+
     socket.on("received message", (data) {
       MessageModel msg = MessageModel(
           type: data["type"],
           idSender: data["sender"],
           content: data["content"],
           roomId: data["room"]);
-      print("id sender: msg:${msg.idSender}");
+      print("ON received message ${msg.content}");
       receivedMessage(msg);
     });
   }
@@ -68,6 +71,6 @@ class ChatSocketIO {
     print("socket live: ${socket != null}");
     socket.emit("chat message",
         {'room': roomid, 'sender': sender, 'content': content, 'type': type});
-    // return this;
+    print("socket emit chat message  $content");
   }
 }
