@@ -38,7 +38,6 @@ class _ChatFlowState extends State<ChatFlow> {
   }
 
   listennerScroll() {
-    print("Scrool pos ${chatController.offset}");
     if (chatController.offset == 0.0) {
       _model.loadmoreMessageForRoom();
     }
@@ -49,9 +48,9 @@ class _ChatFlowState extends State<ChatFlow> {
       var scrollPosition = chatController.position;
       if (scrollPosition.maxScrollExtent > scrollPosition.minScrollExtent) {
         chatController.animateTo(
-          scrollPosition.maxScrollExtent + 150,
-          duration: new Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          scrollPosition.maxScrollExtent + 100,
+          duration: new Duration(milliseconds: 500),
+          curve: Curves.easeIn,
         );
       }
     }
@@ -83,72 +82,98 @@ class _ChatFlowState extends State<ChatFlow> {
       builder: (context, model, child) {
         _model = model;
         return Container(
-          child: Column(
+          child: Stack(
+            alignment: Alignment.bottomCenter,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(color: Colors.black38),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      margin: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColor.actionColor,
-                      ),
-                      child: Icon(Icons.people),
+              Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(color: Colors.black38),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          margin: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColor.actionColor,
+                          ),
+                          child: Icon(Icons.people),
+                        ),
+                        _model.rooms.isEmpty
+                            ? Container()
+                            : Text(
+                                _model.rooms[_model.indexSelected].name,
+                                style: TextStyle(
+                                    color: Colors.white, fontFamily: 'Gotu'),
+                              )
+                      ],
                     ),
-                    _model.rooms.isEmpty
-                        ? Container()
-                        : Text(
-                            _model.rooms[_model.indexSelected].name,
-                            style: TextStyle(
-                                color: Colors.white, fontFamily: 'Gotu'),
-                          )
-                  ],
+                  ),
+                  Expanded(
+                      child: model.messageForRoom == null ||
+                              model.messageForRoom.isEmpty
+                          ? Container()
+                          : model.isLoadingMessage
+                              ? Loading(
+                                  title: "Loading Message",
+                                )
+                              : ListView.builder(
+                                  controller: chatController,
+                                  itemCount: model.messageForRoom.length,
+                                  itemBuilder: (context, index) {
+                                    return Message(
+                                        message: model.messageForRoom[index],
+                                        user: _model.user);
+                                  },
+                                )),
+                                              Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                      ),
+                      child: Row(
+                        children: chatActions
+                            .asMap()
+                            .map((key, action) =>
+                                MapEntry(action, actionItem(action)))
+                            .values
+                            .toList(),
+                      )),
+                ],
+              ),
+              Visibility(
+                visible: _model.isnewMessage,
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  margin: EdgeInsets.only(bottom: 89),
+                  child: Container(
+                      margin: EdgeInsets.all(8),
+                      child: ClipOval(
+                        child: Material(
+                          color: Colors.black.withOpacity(0.4),
+                          child: InkWell(
+                            splashColor: Colors.red,
+                            onTap: () {
+                              scrollToEnd();
+                              _model.setEventNewMessage(false);
+                            },
+                            child: SizedBox(
+                              width: 42,
+                              height: 42,
+                              child: Icon(
+                                Icons.keyboard_arrow_down,
+                                color: AppColor.actionColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )),
                 ),
               ),
-              Expanded(
-                  child: model.messageForRoom == null ||
-                          model.messageForRoom.isEmpty
-                      ? Container()
-                      : model.isLoadingMessage
-                          ? Loading(
-                              title: "Loading Message",
-                            )
-                          : ListView.builder(
-                              controller: chatController,
-                              itemCount: model.messageForRoom.length,
-                              itemBuilder: (context, index) {
-                                if (index == model.messageForRoom.length) {
-                                  scrollToEnd();
-                                  // return Loadmore(
-                                  //   onLoadmoreClick: (){
-
-                                  //   },
-                                  // );
-                                }
-                                return Message(
-                                    message: model.messageForRoom[index],
-                                    user: _model.user);
-                              },
-                            )),
-              Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.black38,
-                  ),
-                  child: Row(
-                    children: chatActions
-                        .asMap()
-                        .map((key, action) =>
-                            MapEntry(action, actionItem(action)))
-                        .values
-                        .toList(),
-                  )),
             ],
           ),
         );

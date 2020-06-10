@@ -29,5 +29,28 @@
     }
   </script>
   <script src="main.dart.js" type="application/javascript"></script>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-analytics.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCfxzXD6h8Wv1R1i6UT5b0-ZRTccz34UZM",
+    authDomain: "homie-2d660.firebaseapp.com",
+    databaseURL: "https://homie-2d660.firebaseio.com",
+    projectId: "homie-2d660",
+    storageBucket: "homie-2d660.appspot.com",
+    messagingSenderId: "79076059562",
+    appId: "1:79076059562:web:a46d78bfaa1d65cc45e3d3",
+    measurementId: "G-R2LRFZQHXX"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
 </body>
 </html>

@@ -23,8 +23,6 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
 
   @override
   void initState() {
-    _userNameController.text = "tinhpt";
-    _pwdController.text = "canary";
     super.initState();
   }
 

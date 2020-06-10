@@ -29,6 +29,8 @@ class HomeModel extends PageModel {
   bool get isLogginOut => _isLogouting;
   bool _isLogout = false;
   bool get isLogout => _isLogout;
+  bool _isNewMessage = false;
+  bool get isnewMessage => _isNewMessage;
   int _limit = 10;
   int _totalOnline = 0;
   int get totalOnline => _totalOnline;
@@ -42,15 +44,12 @@ class HomeModel extends PageModel {
   listenner() {
     _chatSocketIO.listener(_user,
         invokeRoom: addRooms,
-        invokeInviteToRoom: inviteToRoom,
-        receivedMessage: (msg) {
+        invokeInviteToRoom: inviteToRoom, receivedMessage: (msg) {
       print("recived Message home model call back");
       receivedMessage(msg);
-    },
-    usersOnline: (uOnlines){
+    }, usersOnline: (uOnlines) {
       setTotalOnline(uOnlines.length);
-    }
-    );
+    });
   }
 
   inviteToRoom(Room room) {
@@ -73,6 +72,12 @@ class HomeModel extends PageModel {
     if (currentRoom.id == value.roomId) {
       _messageForRoom = _messageAllRoom[value.roomId];
     }
+    setEventNewMessage(true);
+    notifyListeners();
+  }
+
+  setEventNewMessage(bool val) {
+    _isNewMessage = val;
     notifyListeners();
   }
 
@@ -106,7 +111,7 @@ class HomeModel extends PageModel {
 
   // normal
 
-  setTotalOnline(int value){
+  setTotalOnline(int value) {
     _totalOnline = value;
     notifyListeners();
   }
@@ -190,10 +195,10 @@ class HomeModel extends PageModel {
     await Api().getUserOnline(onSuccess: setUserOnline, onError: (msg) {});
   }
 
-  autoJoinRoom(){
+  autoJoinRoom() {
     _rooms.forEach((e) {
       _chatSocketIO.acceptInviteIntoRoom(e.id);
-     });
+    });
   }
 
   getRoomOfUserId({int limit = 10}) async {

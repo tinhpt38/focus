@@ -24,18 +24,6 @@ class _RegisterPageState extends State<RegisterPage> with ResponsivePage {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   AuthModel _model;
-  @override
-  void initState() {
-    fullNameCotller.text = 'Phan Trung Tinh';
-    userNameCotller.text = 'tinhpt';
-    emailCotller.text = 'tinhpt.38@gmail.com';
-    passwordCotller.text = 'canary';
-    confirmPwdCotller.text = 'canary';
-    addressCotller.text = 'Da Lat';
-    phoneCotller.text = '0352974899';
-    websiteCotller.text = 'www.codepsoft.com';
-    super.initState();
-  }
 
   onRegisterclick() async {
     if (_formKey.currentState.validate()) {

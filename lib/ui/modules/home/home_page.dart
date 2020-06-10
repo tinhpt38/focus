@@ -208,19 +208,22 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Center(
-                        child: Text(
-                          "Create Room",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Gotu',
-                              fontSize: 16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Create Room",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'Gotu',
+                                fontSize: 16),
+                          ),
                         ),
                       ),
                       Container(
                           margin: EdgeInsets.all(8),
                           child: ClipOval(
                             child: Material(
-                              color: AppColor.actionColor, // button color
+                              color: AppColor.actionColor,
                               child: InkWell(
                                 splashColor: Colors.red,
                                 onTap: () {
@@ -241,24 +244,30 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                   ),
                   Container(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Room name",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Gotu',
-                          fontSize: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Room name",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Gotu',
+                            fontSize: 12),
+                      ),
                     ),
                   ),
                   buildInput(roomNameController,
                       hintText: "Room name", onChange: (text) {}),
                   Container(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Members added",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Gotu',
-                          fontSize: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Members added",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Gotu',
+                            fontSize: 12),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -279,14 +288,17 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                   )),
                   Container(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Look for friends (${_model.totalOnline}/${_model.userOnlineOrigin.length - 1})",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Gotu',
-                          fontSize: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Look for friends (${_model.totalOnline}/${_model.userOnlineOrigin.length - 1})",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Gotu',
+                            fontSize: 12),
+                      ),
                     ),
                   ),
                   buildInput(searchController, onChange: (text) {
