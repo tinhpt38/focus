@@ -8,6 +8,7 @@ class NavigationHorizontalRail extends StatefulWidget {
   final Function(int) onChangeSelectedIndex;
   final int selectedIndex;
   final List<NavigationHorizontalRailDestination> destinations;
+  final ScrollController controller;
 
   NavigationHorizontalRail(
       {this.backgroundColor,
@@ -15,7 +16,8 @@ class NavigationHorizontalRail extends StatefulWidget {
       this.destinations,
       this.selectedColor,
       this.splashColor = Colors.red,
-      this.selectedIndex});
+      this.selectedIndex, 
+      this.controller});
 
   @override
   _NavigationHorizontalRailState createState() =>
@@ -38,6 +40,7 @@ class _NavigationHorizontalRailState
     return Container(
         color: widget.backgroundColor,
         child: ListView.builder(
+          controller: widget.controller,
           itemCount: widget.destinations.length,
           itemBuilder: (context, index) => FlatButton(
             splashColor: widget.splashColor,

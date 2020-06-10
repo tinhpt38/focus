@@ -58,6 +58,13 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
   }
 
   @override
+  void dispose() {
+    _roomsController.removeListener(_roomsScrollListenner);
+    _searchUserController.removeListener(_searchScrollListenner);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BasePage<HomeModel>(
       model: widget.model,
@@ -132,6 +139,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                   ),
                   Expanded(
                     child: NavigationHorizontalRail(
+                      controller: _roomsController,
                       backgroundColor: AppColor.background,
                       selectedColor: AppColor.actionColor,
                       selectedIndex: _model.indexSelected,
@@ -309,6 +317,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                     // color: Colors.black38,
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: ListView.builder(
+                      controller: _searchUserController,
                         itemCount: _model.userOnline.length,
                         itemBuilder: (context, index) {
                           return UserItem(
