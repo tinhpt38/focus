@@ -92,7 +92,11 @@ class _RegisterPageState extends State<RegisterPage> with ResponsivePage {
 
   @override
   Widget buildTablet(BuildContext context) {
-    return buildMobile(context);
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal:size.width * 1/4),
+      child: buildMobile(context)
+    );
   }
 
   @override

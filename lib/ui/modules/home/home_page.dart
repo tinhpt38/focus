@@ -40,7 +40,6 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
       _model.setBusy(true);
       await _model.getUserOnline();
       await _model.getRoomOfUserId();
-      _model.autoJoinRoom();
       _model.setBusy(false);
     });
   }
@@ -149,11 +148,39 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                       destinations: _model.rooms
                           .map((e) => NavigationHorizontalRailDestination(
                                 padding: EdgeInsets.symmetric(vertical: 8),
-                                title: Container(
-                                  child: Text(e.name ?? "",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'Gotu')),
+                                title: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      flex: 4,
+                                      child: Container(
+                                        margin:
+                                            EdgeInsets.only(left: 8, right: 8),
+                                        child: Text(e.name ?? "",
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'Gotu')),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Visibility(
+                                        visible: _model.roomIdHaveNewMessage[e.id] ?? false,
+                                        child: SizedBox(
+                                          width: 12,
+                                          height: 12,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 icon: Container(
                                     alignment: Alignment.center,
@@ -317,7 +344,7 @@ class _HomePageState extends State<HomePage> with ResponsivePage {
                     // color: Colors.black38,
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: ListView.builder(
-                      controller: _searchUserController,
+                        controller: _searchUserController,
                         itemCount: _model.userOnline.length,
                         itemBuilder: (context, index) {
                           return UserItem(

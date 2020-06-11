@@ -5,9 +5,9 @@ class Room{
   // String id;
   // List<String> members;
 
-  dynamic owner;
-  dynamic name;
-  dynamic id;
+  String owner;
+  String name;
+  String id;
   List<dynamic> members;
 
   Room({this.owner, this.name, this.members, this.id});

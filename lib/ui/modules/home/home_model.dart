@@ -19,7 +19,7 @@ class HomeModel extends PageModel {
   List<User> get userOnline => _userOnlineTemp;
   List<User> _memberInListAdd = List();
   List<User> get memberInListAdd => _memberInListAdd;
-  ChatSocketIO _chatSocketIO;
+  ChatSocketIO _chatSocketIO = ChatSocketIO();
   Map<String, List<MessageModel>> _messageAllRoom = {};
   List<MessageModel> _messageForRoom = List();
   List<MessageModel> get messageForRoom => _messageForRoom;
@@ -34,10 +34,13 @@ class HomeModel extends PageModel {
   int _limit = 10;
   int _totalOnline = 0;
   int get totalOnline => _totalOnline;
+  Map<String, bool> _roomIdHaveNewMessage = Map();
+  Map<String, bool> get roomIdHaveNewMessage => _roomIdHaveNewMessage;
+  Room _currentRoom = Room();
+  Room get currentRoom => _currentRoom;
 
   HomeModel({User user}) {
     _user = user;
-    _chatSocketIO = ChatSocketIO();
   }
 
   //begin socket
@@ -53,26 +56,26 @@ class HomeModel extends PageModel {
   }
 
   inviteToRoom(Room room) {
-    bool isHaveRoom = false;
-    _rooms.forEach((r) {
-      if (r.id as String == room.id as String) {
-        isHaveRoom = true;
+    bool roomFlag = true;
+    _rooms.map((e) {
+      if (e.id == room.id) {
+        roomFlag = false;
       }
     });
-    if (!isHaveRoom) {
-      print("add to room");
+    if (!roomFlag) {
       addRooms(room);
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   receivedMessage(MessageModel value) {
     _messageAllRoom[value.roomId].add(value);
-    Room currentRoom = _rooms[_indexSelected];
+    _currentRoom = _rooms[_indexSelected];
     if (currentRoom.id == value.roomId) {
       _messageForRoom = _messageAllRoom[value.roomId];
     }
     setEventNewMessage(true);
+    addIdToRoomNewMessage(value.roomId);
     notifyListeners();
   }
 
@@ -99,17 +102,29 @@ class HomeModel extends PageModel {
   }
 
   addMessage({dynamic type, dynamic content}) {
-    Room room = _rooms[_indexSelected];
+    _currentRoom = _rooms[_indexSelected];
     MessageModel messageModel = MessageModel(
-        roomId: room.id, idSender: user.id, content: content, type: type);
-    _messageAllRoom[room.id].add(messageModel);
-    // _messageForRoom.add(messageModel);
+        roomId: _currentRoom.id,
+        idSender: user.id,
+        content: content,
+        type: type);
+    _messageAllRoom[_currentRoom.id].add(messageModel);
     _chatSocketIO.chat(_rooms[_indexSelected].id, user.id, content, type);
     notifyListeners();
   }
   //end socket
 
   // normal
+  addIdToRoomNewMessage(String id) {
+    _roomIdHaveNewMessage[id] = true;
+    print('room new message $id');
+    notifyListeners();
+  }
+
+  removeIdToRoomNewMessage(String id) {
+    _roomIdHaveNewMessage[id] = false;
+    notifyListeners();
+  }
 
   setTotalOnline(int value) {
     _totalOnline = value;
@@ -165,11 +180,12 @@ class HomeModel extends PageModel {
 
   changeIndexSelected(int index) async {
     _indexSelected = index;
-    String roomID = _rooms[index].id;
-    if (_messageAllRoom[roomID] == null) {
+    _currentRoom = _rooms[index];
+    if (_messageAllRoom[_currentRoom.id] == null) {
       await getAllMessageForRoom();
     }
-    _messageForRoom = _messageAllRoom[roomID];
+    removeIdToRoomNewMessage(_currentRoom.id);
+    _messageForRoom = _messageAllRoom[_currentRoom.id];
     notifyListeners();
   }
 
@@ -213,19 +229,20 @@ class HomeModel extends PageModel {
           notifyListeners();
         },
         onError: (msg) {});
+    // autoJoinRoom();
   }
 
   getAllMessageForRoom({int limit = 10}) async {
     setLoadingMessage(true);
-    String roomID = _rooms[_indexSelected].id;
+    _currentRoom = _rooms[_indexSelected];
     await Api().getMessageForRoom(
         limit: limit,
-        roomId: roomID,
+        roomId: _currentRoom.id,
         onSuccess: (values) {
-          updateMessageAllRoom(values, roomID);
+          updateMessageAllRoom(values, _currentRoom.id);
           setLoadingMessage(false);
         });
-    _messageForRoom = _messageAllRoom[roomID];
+    _messageForRoom = _messageAllRoom[_currentRoom.id];
     notifyListeners();
     setLoadingMessage(false);
   }

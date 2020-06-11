@@ -16,8 +16,7 @@ class ChatSocketIO {
       {Function(Room) invokeRoom,
       Function(Room) invokeInviteToRoom,
       Function(MessageModel) receivedMessage,
-      Function(List<User>) usersOnline
-      }) {
+      Function(List<User>) usersOnline}) {
     socket.on('connect', (_) {
       print("connected");
       socket.emit("user join", user.toJson());
@@ -44,9 +43,8 @@ class ChatSocketIO {
           members: data['members'],
           owner: data['owner'],
           name: data['name']);
-      print("ON invite to room ${room.name}");
+      acceptInviteIntoRoom(room.id);
       if (room.members.contains(user.id)) {
-        acceptInviteIntoRoom(room.id);
         invokeInviteToRoom(room);
       }
     });
