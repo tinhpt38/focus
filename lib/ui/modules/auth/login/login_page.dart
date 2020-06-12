@@ -85,6 +85,7 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
   @override
   Widget buildTablet(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    print("build tablet");
     return Container(
       alignment: Alignment.center,
       color: AppColor.background,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/base/loading.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
+import 'package:focus_app/ui/modules/home/items/user_chat_item.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/message.dart';
 import 'package:provider/provider.dart';
 import 'package:file_access/file_access.dart';
@@ -17,6 +18,9 @@ List<ChatAction> chatActions = [
 ];
 
 class ChatFlow extends StatefulWidget {
+  final bool isDisableUser;
+
+  ChatFlow({this.isDisableUser = false});
   @override
   _ChatFlowState createState() => _ChatFlowState();
 }
@@ -87,30 +91,11 @@ class _ChatFlowState extends State<ChatFlow> {
             children: [
               Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(color: Colors.black38),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          margin: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColor.actionColor,
-                          ),
-                          child: Icon(Icons.people),
-                        ),
-                        _model.rooms.isEmpty
-                            ? Container()
-                            : Text(
-                                _model.rooms[_model.indexSelected].name,
-                                style: TextStyle(
-                                    color: Colors.white, fontFamily: 'Gotu'),
-                              )
-                      ],
-                    ),
+                  Visibility(
+                    visible: widget.isDisableUser,
+                    child: _model.rooms.isEmpty
+                        ? Container()
+                        : UserChatItem(name:_model.rooms[_model.indexSelected].name),
                   ),
                   Expanded(
                       child: model.messageForRoom == null ||
@@ -129,7 +114,7 @@ class _ChatFlowState extends State<ChatFlow> {
                                         user: _model.user);
                                   },
                                 )),
-                                              Container(
+                  Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       width: double.infinity,
                       decoration: BoxDecoration(
