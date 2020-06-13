@@ -9,10 +9,10 @@ import 'package:file_access/file_access.dart';
 
 enum ChatAction { location, voice, picture, attach, text, send }
 List<ChatAction> chatActions = [
-  ChatAction.location,
-  ChatAction.voice,
-  ChatAction.picture,
-  ChatAction.attach,
+  // ChatAction.location,
+  // ChatAction.voice,
+  // ChatAction.picture,
+  // ChatAction.attach,
   ChatAction.text,
   ChatAction.send
 ];
@@ -195,6 +195,7 @@ class _ChatFlowState extends State<ChatFlow> {
           return Expanded(
             flex: 5,
             child: Container(
+              margin: const EdgeInsets.only(left:24),
               child: TextField(
                 autofocus: true,
                 focusNode: textNode,

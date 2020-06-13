@@ -70,6 +70,7 @@ class ChatSocketIO {
   }
 
   acceptInviteIntoRoom(String id) {
+    print("join room $id");
     socket.emit("join room", id);
     // return this;
   }

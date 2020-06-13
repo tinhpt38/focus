@@ -32,10 +32,11 @@ class _RegisterPageState extends State<RegisterPage> with ResponsivePage {
           fullName: fullNameCotller.text.trim(),
           userName: userNameCotller.text.trim(),
           password: passwordCotller.text.trim(),
-          phone: phoneCotller.text.trim(),
+          // phone: phoneCotller.text.trim(),/
           email: emailCotller.text.trim(),
-          website: websiteCotller.text.trim(),
-          address: addressCotller.text.trim());
+          // website: websiteCotller.text.trim(),
+          // address: addressCotller.text.trim()
+          );
       await _model.register(user);
       if (_model.success) {
         Navigator.pop(context);
@@ -205,34 +206,34 @@ class _RegisterPageState extends State<RegisterPage> with ResponsivePage {
                       inputType: TextInputType.text,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: AppTextField(
-                      controller: addressCotller,
-                      hintText: 'Address',
-                      isObscure: false,
-                      inputType: TextInputType.text,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: AppTextField(
-                      controller: phoneCotller,
-                      hintText: 'Phone',
-                      isObscure: false,
-                      inputType: TextInputType.text,
-                      validator: validatePhone,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: AppTextField(
-                      controller: websiteCotller,
-                      hintText: 'Website',
-                      isObscure: false,
-                      inputType: TextInputType.text,
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(vertical: 24),
+                  //   child: AppTextField(
+                  //     controller: addressCotller,
+                  //     hintText: 'Address',
+                  //     isObscure: false,
+                  //     inputType: TextInputType.text,
+                  //   ),
+                  // ),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(vertical: 24),
+                  //   child: AppTextField(
+                  //     controller: phoneCotller,
+                  //     hintText: 'Phone',
+                  //     isObscure: false,
+                  //     inputType: TextInputType.text,
+                  //     validator: validatePhone,
+                  //   ),
+                  // ),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(vertical: 24),
+                  //   child: AppTextField(
+                  //     controller: websiteCotller,
+                  //     hintText: 'Website',
+                  //     isObscure: false,
+                  //     inputType: TextInputType.text,
+                  //   ),
+                  // ),
                   Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: RaisedButton(

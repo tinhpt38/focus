@@ -186,6 +186,7 @@ class HomeModel extends PageModel {
     }
     removeIdToRoomNewMessage(_currentRoom.id);
     _messageForRoom = _messageAllRoom[_currentRoom.id];
+    _chatSocketIO.acceptInviteIntoRoom(_currentRoom.id);
     notifyListeners();
   }
 
@@ -211,8 +212,8 @@ class HomeModel extends PageModel {
     await Api().getUserOnline(onSuccess: setUserOnline, onError: (msg) {});
   }
 
-  autoJoinRoom() {
-    _rooms.forEach((e) {
+  autoJoinAllRoom() {
+    _rooms.map((e) {
       _chatSocketIO.acceptInviteIntoRoom(e.id);
     });
   }
@@ -229,7 +230,7 @@ class HomeModel extends PageModel {
           notifyListeners();
         },
         onError: (msg) {});
-    // autoJoinRoom();
+        //autoJoinAllRoom();
   }
 
   getAllMessageForRoom({int limit = 10}) async {
