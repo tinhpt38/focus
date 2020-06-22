@@ -3,7 +3,6 @@ import 'package:focus_app/ui/base/app_color.dart';
 import 'package:focus_app/ui/modules/home/home_model.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/select_item.dart';
 import 'package:focus_app/ui/modules/home/widgets/search_user/user_item.dart';
-import 'package:provider/provider.dart';
 
 class CreateNewRoom extends StatefulWidget {
 

@@ -8,6 +8,7 @@ class User {
   final String website;
   final String id;
   final List<String> rooms;
+  final int role;
 
   User(
       {this.userName,
@@ -18,7 +19,8 @@ class User {
       this.phone,
       this.website,
       this.id,
-      this.rooms});
+      this.rooms,
+      this.role});
 
   User.formJson(Map<String, dynamic> json)
       : this.userName = json['username'],
@@ -29,7 +31,8 @@ class User {
         this.phone = json['phone'],
         this.id = json['_id'],
         this.website = json['website'],
-        this.rooms = json['rooms'];
+        this.rooms = json['rooms'],
+        this.role = json['role'];
 
   Map<String, dynamic> toJson() => {
         'username': this.userName,
@@ -40,6 +43,7 @@ class User {
         'phone': this.phone,
         'rooms': this.rooms,
         'website':this.website,
-        '_id': this.id
+        '_id': this.id,
+        'role':this.role
       };
 }
