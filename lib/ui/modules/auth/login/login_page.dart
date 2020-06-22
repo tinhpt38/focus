@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> with ResponsivePage {
         _userNameController.text.trim(), _pwdController.text.trim());
 
     if (_model.success) {
-      if (_model.user.role == 0) {
+      if (_model.user.role == "0") {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(

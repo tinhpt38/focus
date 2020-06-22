@@ -10,6 +10,7 @@ import 'package:focus_app/ui/base/navigation_rail.dart';
 import 'package:focus_app/ui/base/responsive.dart';
 import 'package:focus_app/ui/base/restart_widget.dart';
 import 'package:focus_app/ui/modules/admin/admin_page_model.dart';
+import 'package:focus_app/ui/modules/home/widgets/chats/admin_chat_all.dart';
 import 'package:focus_app/ui/modules/home/widgets/chats/chat.dart';
 
 class AdminPage extends StatefulWidget {
@@ -114,7 +115,7 @@ class _AdminPageState extends State<AdminPage> with ResponsivePage {
                               child: NavigationHorizontalRail(
                                 // controller: _roomsController,
                                 backgroundColor: AppColor.background,
-                                selectedColor: AppColor.actionColor,
+                                selectedColor: AppColor.background,
                                 selectedIndex: 0,
                                 onChangeSelectedIndex: (index) {
                                   // _model.changeIndexSelected(index);
@@ -196,7 +197,7 @@ class _AdminPageState extends State<AdminPage> with ResponsivePage {
                             border: Border(
                                 left:
                                     BorderSide(color: Colors.white, width: 1))),
-                        child: ChatFlow(),
+                        child: ChatFlowAdmin(),
                       ),
                     ),
                     Expanded(

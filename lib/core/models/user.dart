@@ -8,7 +8,7 @@ class User {
   final String website;
   final String id;
   final List<String> rooms;
-  final int role;
+  final dynamic role;
 
   User(
       {this.userName,

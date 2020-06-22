@@ -17,6 +17,15 @@ class ChatSocketIO {
       print("connected");
       socket.emit("user join", user.toJson());
     });
+    socket.on("disconnect", (data) {
+      List<dynamic> dataRe = data as List<dynamic>;
+      List<User> userOnline = List();
+      dataRe.forEach((js) {
+        userOnline.add(User.formJson(js));
+      });
+      onlineList(userOnline);
+    });
+
     socket.on("online list", (data) {
       print("user list");
       List<dynamic> dataRe = data as List<dynamic>;
@@ -96,5 +105,9 @@ class ChatSocketIO {
     socket.emit("chat message",
         {'room': roomid, 'sender': sender, 'content': content, 'type': type});
     print("socket emit chat message  $content");
+  }
+
+  chatAll(String content) {
+    socket.emit("chat all", {'content': content});
   }
 }
