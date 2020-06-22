@@ -274,6 +274,7 @@ class HomeModel extends PageModel {
       setLogout(false);
       return;
     });
+    _chatSocketIO.disconnected();
     setLogingOut(false);
   }
 }

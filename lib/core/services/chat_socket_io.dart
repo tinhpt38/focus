@@ -17,7 +17,7 @@ class ChatSocketIO {
       print("connected");
       socket.emit("user join", user.toJson());
     });
-    socket.on("disconnect", (data) {
+    socket.on("user disconnected", (data) {
       List<dynamic> dataRe = data as List<dynamic>;
       List<User> userOnline = List();
       dataRe.forEach((js) {
@@ -109,5 +109,12 @@ class ChatSocketIO {
 
   chatAll(String content) {
     socket.emit("chat all", {'content': content});
+  }
+
+  disconnected() {
+    socket.disconnect();
+    // socket.emit("disconnect",{
+    //   "":""
+    // });
   }
 }
