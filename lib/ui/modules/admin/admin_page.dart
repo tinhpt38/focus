@@ -203,8 +203,35 @@ class _AdminPageState extends State<AdminPage> with ResponsivePage {
                     Expanded(
                         flex: 3,
                         child: Container(
-                          color: Colors.red,
-                          //todo: left content
+                          decoration: BoxDecoration(
+                            color: AppColor.background,
+                            border: Border(
+                                left:
+                                    BorderSide(color: Colors.white, width: 1)),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Text(
+                                  "Online",
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                      fontFamily: "Gotu"),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Text(
+                                    "${_model.userOnlineList.length} / ##",
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        color: Colors.white,
+                                        fontFamily: "Gotu")),
+                              ),
+                            ],
+                          ),
                         )),
                   ],
                 ),

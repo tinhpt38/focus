@@ -28,9 +28,9 @@ class ChatSocketIO {
 
     socket.on("online list", (data) {
       print("user list");
-      List<dynamic> dataRe = data as List<dynamic>;
+      // List<String> dataRe = data;
       List<User> userOnline = List();
-      dataRe.forEach((js) {
+      data.forEach((js) {
         userOnline.add(User.formJson(js));
       });
       onlineList(userOnline);

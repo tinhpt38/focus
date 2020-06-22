@@ -2,9 +2,9 @@ import 'package:focus_app/core/api/api.dart';
 import 'package:focus_app/core/models/message.dart';
 import 'package:focus_app/core/models/user.dart';
 import 'package:focus_app/core/services/chat_socket_io.dart';
-import 'package:focus_app/ui/base/base_page_model.dart';
+import 'package:focus_app/ui/modules/home/home_model.dart';
 
-class AdminModel extends PageModel {
+class AdminModel extends HomeModel {
   ChatSocketIO _chatSocketIO = ChatSocketIO();
   User _user;
   User get user => _user;
