@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:focus_app/ui/modules/auth/login/login_page.dart';
-import 'package:responsive_builder/responsive_builder.dart';
+import 'package:focus_app/res_ui.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home:LoginPage(),
+      home: ResUI(),
     );
   }
 }

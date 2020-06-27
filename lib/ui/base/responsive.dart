@@ -3,6 +3,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 
 
 
+
 abstract class ResponsivePage{
 
   Widget buildDesktop(BuildContext context);
@@ -25,4 +26,5 @@ abstract class ResponsivePage{
       );
     });
   }
+  
 }
